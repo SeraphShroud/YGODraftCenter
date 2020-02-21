@@ -1,4 +1,6 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+First install node.js https://nodejs.org/en/ 
+
+Then in the directory you want the project in, `git clone https://github.com/SeraphShroud/ygodraftcenter.git`
 
 ## Available Scripts
 

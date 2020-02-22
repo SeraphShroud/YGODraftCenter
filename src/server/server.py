@@ -6,6 +6,7 @@ import json
 import time
 from threading import Thread, Lock
 from rooms import Rooms, RoomNotFound, NotInRoom, RoomFull
+from mongo_database import MongoDBEngine as db
 
 
 def main_loop(tcp_port, udp_port, rooms):
@@ -314,20 +315,31 @@ if __name__ == "__main__":
     """
     Start a game server
     """
-    parser = argparse.ArgumentParser(description='Simple game server')
-    parser.add_argument('--tcpport', '-t',
-                        dest='tcp_port',
-                        help='Listening tcp port',
-                        default="1234")
-    parser.add_argument('--udpport', '-u',
-                        dest='udp_port',
-                        help='Listening udp port',
-                        default="1234")
-    parser.add_argument('--capacity', '-c',
-                        dest='room_capacity',
-                        help='Max players per room',
-                        default="4")
+    # parser = argparse.ArgumentParser(description='Simple game server')
+    # parser.add_argument('--tcpport', '-t',
+    #                     dest='tcp_port',
+    #                     help='Listening tcp port',
+    #                     default="1234")
+    # parser.add_argument('--udpport', '-u',
+    #                     dest='udp_port',
+    #                     help='Listening udp port',
+    #                     default="1234")
+    # parser.add_argument('--capacity', '-c',
+    #                     dest='room_capacity',
+    #                     help='Max players per room',
+    #                     default="4")
 
-    args = parser.parse_args()
-    rooms = Rooms(int(args.room_capacity))
-    main_loop(args.tcp_port, args.udp_port, rooms)
+    # args = parser.parse_args()
+    # rooms = Rooms(int(args.room_capacity))
+    # main_loop(args.tcp_port, args.udp_port, rooms)
+
+    card = {
+        "id": 6983839,
+        "name": "Tornado Dragon",
+        "type": "XYZ Monster",
+        "desc": "2 Level 4 monsters Once per turn, during either player's turn: You can detach 1 Xyz Material from this card, then target 1 Spell/Trap Card on the field; destroy it."
+    }
+    db.delete_card_info(card)
+    db.insert_card_info(card)
+
+    print(db.get_collection("card_info"))

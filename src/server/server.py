@@ -4,6 +4,7 @@ import argparse
 import socket
 import json
 import time
+import api_requests
 from threading import Thread, Lock
 from rooms import Rooms, RoomNotFound, NotInRoom, RoomFull
 from mongo_database import MongoDBEngine as db
@@ -315,31 +316,51 @@ if __name__ == "__main__":
     """
     Start a game server
     """
-    # parser = argparse.ArgumentParser(description='Simple game server')
-    # parser.add_argument('--tcpport', '-t',
-    #                     dest='tcp_port',
-    #                     help='Listening tcp port',
-    #                     default="1234")
-    # parser.add_argument('--udpport', '-u',
-    #                     dest='udp_port',
-    #                     help='Listening udp port',
-    #                     default="1234")
-    # parser.add_argument('--capacity', '-c',
-    #                     dest='room_capacity',
-    #                     help='Max players per room',
-    #                     default="4")
+    parser = argparse.ArgumentParser(description='Simple game server')
+    parser.add_argument('--tcpport', '-t',
+                        dest='tcp_port',
+                        help='Listening tcp port',
+                        default="1234")
+    parser.add_argument('--udpport', '-u',
+                        dest='udp_port',
+                        help='Listening udp port',
+                        default="1234")
+    parser.add_argument('--capacity', '-c',
+                        dest='room_capacity',
+                        help='Max players per room',
+                        default="4")
 
-    # args = parser.parse_args()
-    # rooms = Rooms(int(args.room_capacity))
-    # main_loop(args.tcp_port, args.udp_port, rooms)
+    args = parser.parse_args()
+    rooms = Rooms(int(args.room_capacity))
+    main_loop(args.tcp_port, args.udp_port, rooms)
 
-    card = {
-        "id": 6983839,
-        "name": "Tornado Dragon",
-        "type": "XYZ Monster",
-        "desc": "2 Level 4 monsters Once per turn, during either player's turn: You can detach 1 Xyz Material from this card, then target 1 Spell/Trap Card on the field; destroy it."
-    }
-    db.delete_card_info(card)
-    db.insert_card_info(card)
+    # Comment this in and comment out the above for basic unit testing
+    # card_1 = {
+    #     "id": 6983839,
+    #     "name": "Tornado Dragon",
+    #     "type": "XYZ Monster",
+    #     "desc": "2 Level 4 monsters Once per turn, during either player's turn: You can detach 1 Xyz Material from this card, then target 1 Spell/Trap Card on the field; destroy it."
+    # }
+    # card_2 = {
+    #     "id": 34541863,
+    #     "name": "\"A\" Cell Breeding Device",
+    #     "type": "Spell Card",
+    #     "desc": "During each of your Standby Phases, put 1 A-Counter on 1 face-up monster your opponent controls."
+    # }
+    # id_list = [
+    #     77235086,
+    #     25857246
+    # ]
 
-    print(db.get_collection("card_info"))
+    # card_list = [card_1, card_2]
+
+    # db.delete_card_info(card_1)
+    # db.insert_card_info(card_1)
+
+    # print(db.get_collection("card_info"))
+
+    # db.insert_cards(card_list)
+
+    # api_requests.populate_db()
+
+    # db.get_card_list(id_list)

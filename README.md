@@ -2,6 +2,13 @@ First install node.js https://nodejs.org/en/
 
 Then in the directory you want the project in, `git clone https://github.com/SeraphShroud/ygodraftcenter.git`
 
+## Dependencies
+
+To run this project, please install the dependencies in the requirements.txt
+### `pip install -r requirements.txt`
+
+
+
 ## Available Scripts
 
 In the project directory, you can run:

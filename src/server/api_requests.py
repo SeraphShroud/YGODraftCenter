@@ -1,11 +1,10 @@
 import requests
-from mongo_database import MongoDBEngine as db
 
 API_URL = "https://db.ygoprodeck.com/api/v6/cardinfo.php"
 
 
-def populate_db():
+def populate_card_info_db(db_obj):
     resp = requests.get(API_URL)
     print(resp)
     card_list = resp.json()
-    db.insert_cards(card_list)
+    db_obj.insert_cards(card_list)

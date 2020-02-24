@@ -7,7 +7,7 @@ import time
 import api_requests
 from threading import Thread, Lock
 from rooms import Rooms, RoomNotFound, NotInRoom, RoomFull
-from mongo_database import MongoDBEngine as db
+from ygo_card_db_service import YGOCardDBService
 
 
 def main_loop(tcp_port, udp_port, rooms):
@@ -51,7 +51,7 @@ def main_loop(tcp_port, udp_port, rooms):
                 print("Players :")
                 for player in room.players:
                     print(player.identifier)
-            except:
+            except BaseException:
                 print("Error while getting room informations")
         elif cmd.startswith("user "):
             try:
@@ -59,7 +59,7 @@ def main_loop(tcp_port, udp_port, rooms):
                 print("%s : %s:%d" % (player.identifier,
                                       player.udp_addr[0],
                                       player.udp_addr[1]))
-            except:
+            except BaseException:
                 print("Error while getting user informations")
         elif cmd == "quit" or cmd == "q":
             print("Shutting down server...")
@@ -133,7 +133,7 @@ class UdpServer(Thread):
                                                 room_id,
                                                 payload['message'],
                                                 self.sock)
-                            except:
+                            except BaseException:
                                 pass
                         elif action == "sendto":
                             try:
@@ -142,7 +142,7 @@ class UdpServer(Thread):
                                                   payload['recipients'],
                                                   payload['message'],
                                                   self.sock)
-                            except:
+                            except BaseException:
                                 pass
                     finally:
                         self.lock.release()
@@ -351,16 +351,23 @@ if __name__ == "__main__":
     #     77235086,
     #     25857246
     # ]
+    # DATABASE_NAME = "yugiohdb"
+    # COLLECTION_NAME = "card_info"
+    # DB_URL = "mongodb://localhost:27017"
+
+    # yugioh_db = YGOCardDBService(DATABASE_NAME, COLLECTION_NAME, DB_URL)
+    # print(yugioh_db)
 
     # card_list = [card_1, card_2]
 
-    # db.delete_card_info(card_1)
-    # db.insert_card_info(card_1)
+    # yugioh_db.delete_card_info(card_1)
+    # yugioh_db.delete_card_info(card_2)
+    # yugioh_db.insert_card_info(card_1)
 
-    # print(db.get_collection("card_info"))
+    # print(yugioh_db.get_collection())
 
-    # db.insert_cards(card_list)
+    # yugioh_db.insert_cards(card_list)
 
-    # api_requests.populate_db()
+    # api_requests.populate_card_info_db(yugioh_db)
 
-    # db.get_card_list(id_list)
+    # yugioh_db.get_card_list(id_list)

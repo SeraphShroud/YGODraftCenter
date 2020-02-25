@@ -1,5 +1,4 @@
-from pymongo import MongoClient
-from server.mongodb_service import MongoDBService
+from mongodb_service import MongoDBService
 
 
 class YGOCardDBService(MongoDBService):
@@ -55,7 +54,7 @@ class YGOCardDBService(MongoDBService):
         new_values = {"$set": card}
         upsert = True
 
-        self._cursor.update(primary_key, new_values, upsert)
+        self._cursor.update_many(primary_key, new_values, upsert)
 
     def insert_cards(self, card_list: list):
         """

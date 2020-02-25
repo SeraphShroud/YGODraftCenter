@@ -6,7 +6,6 @@
         Other subclasses should implement their specific table functions.
 """
 from pymongo import MongoClient
-from pprint import pprint
 
 
 """
@@ -23,7 +22,6 @@ aggregation (group by)      aggregation pipeline
 SELECT INTO NEW_TABLE       $out
 MERGE INTO TABLE            $merge
 transactions                transactions
-
 """
 
 

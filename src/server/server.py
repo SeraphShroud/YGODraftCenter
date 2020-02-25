@@ -7,7 +7,7 @@ import time
 import api_requests
 from threading import Thread, Lock
 from rooms import Rooms, RoomNotFound, NotInRoom, RoomFull
-from ygo_card_db_service import YGOCardDBService
+from server.ygo_card_db_service import YGOCardDBService
 
 
 def main_loop(tcp_port, udp_port, rooms):
@@ -351,23 +351,23 @@ if __name__ == "__main__":
     #     77235086,
     #     25857246
     # ]
-    # DATABASE_NAME = "yugiohdb"
-    # COLLECTION_NAME = "card_info"
-    # DB_URL = "mongodb://localhost:27017"
+    DATABASE_NAME = "yugiohdb"
+    COLLECTION_NAME = "card_info"
+    DB_URL = "mongodb://localhost:27017"
 
-    # yugioh_db = YGOCardDBService(DATABASE_NAME, COLLECTION_NAME, DB_URL)
-    # print(yugioh_db)
+    yugioh_db = YGOCardDBService(DATABASE_NAME, COLLECTION_NAME, DB_URL)
+    print(yugioh_db)
 
-    # card_list = [card_1, card_2]
+    card_list = [card_1, card_2]
 
-    # yugioh_db.delete_card_info(card_1)
-    # yugioh_db.delete_card_info(card_2)
-    # yugioh_db.insert_card_info(card_1)
+    yugioh_db.delete_card_info(card_1)
+    yugioh_db.delete_card_info(card_2)
+    yugioh_db.insert_card_info(card_1)
 
-    # print(yugioh_db.get_collection())
+    print(yugioh_db.get_collection())
 
-    # yugioh_db.insert_cards(card_list)
+    yugioh_db.insert_cards(card_list)
 
-    # api_requests.populate_card_info_db(yugioh_db)
+    api_requests.populate_card_info_db(yugioh_db)
 
-    # yugioh_db.get_card_list(id_list)
+    yugioh_db.get_card_list(id_list)

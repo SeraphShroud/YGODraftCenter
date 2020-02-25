@@ -9,6 +9,7 @@ settings.json
 # dependencies
 /.pnp
 .pnp.js
+.cache
 
 # testing
 /coverage

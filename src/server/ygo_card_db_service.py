@@ -1,5 +1,5 @@
 from pymongo import MongoClient
-from mongodb_service import MongoDBService
+from server.mongodb_service import MongoDBService
 
 
 class YGOCardDBService(MongoDBService):
@@ -10,6 +10,12 @@ class YGOCardDBService(MongoDBService):
 
     def __str__(self):
         return f"Client: {self._client}\nDatabase: {self._database}\nCollection: {self._collection}\nCursor: {self._cursor}"
+
+    def get_collection(self) -> list:
+        resp_list = []
+        for document in self._cursor.find():
+            resp_list.append(document)
+        return resp_list
 
     def get_card_list(self, id_list: list) -> list:
         """

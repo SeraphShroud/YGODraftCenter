@@ -34,9 +34,3 @@ class MongoDBService:
 
     def __str__(self):
         return f"Client: {self._client}\nDatabase: {self._database}"
-
-    def get_collection(self) -> list:
-        resp_list = []
-        for document in self._cursor.find():
-            resp_list.append(document)
-        return resp_list

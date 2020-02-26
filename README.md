@@ -1,5 +1,5 @@
 ## Dependencies
-First install node.js https://nodejs.org/en/ 
+First install node.js https://nodejs.org/en/ and Python 3.7.6 https://www.python.org/downloads/
 
 Then in the directory you want the project in, `git clone https://github.com/SeraphShroud/ygodraftcenter.git`
 

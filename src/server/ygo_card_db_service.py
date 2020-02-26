@@ -2,7 +2,7 @@ from mongodb_service import MongoDBService
 
 
 class YGOCardDBService(MongoDBService):
-    def __init__(self, database_name, collection, db_url):
+    def __init__(self, database_name: str, collection: str, db_url: str):
         super(YGOCardDBService, self).__init__(database_name, db_url)
         self._cursor = self._database[collection]
         self._collection = collection

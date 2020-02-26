@@ -5,6 +5,7 @@ settings.json
 
 # Python compiled
 *.pyc
+*.log
 
 # dependencies
 /.pnp

@@ -3,14 +3,14 @@ import json
 import logging
 import sys
 from pymongo import MongoClient
-from pprint import pprint
+import api_requests
 sys.path.append("..")
 from server.ygo_card_db_service import YGOCardDBService
 
 logger = logging.getLogger()
 
-TEST_DB_NAME = 'testyugiohdb'
-TEST_COLLECTION_NAME = 'test_card_info'
+TEST_DB_NAME = 'TEST_YUGIOH_DB'
+TEST_COLLECTION_NAME = 'TEST_CARD_INFO'
 TEST_DB_PORT = 27017
 TEST_DB_HOST = 'localhost'
 TEST_DB_URL = f'mongodb://{TEST_DB_HOST}:{TEST_DB_PORT}'
@@ -22,20 +22,6 @@ two_card_list = []
 single_card = {}
 four_card_list = []
 malformed_card = {}
-
-# card_1 = {
-#     "id": 6983839,
-#     "name": "Tornado Dragon",
-#     "type": "XYZ Monster",
-#     "desc": "2 Level 4 monsters Once per turn, during either player's turn: You can detach 1 Xyz Material from this card, then target 1 Spell/Trap Card on the field; destroy it."
-# }
-# card_2 = {
-#     "id": 34541863,
-#     "name": "\"A\" Cell Breeding Device",
-#     "type": "Spell Card",
-#     "desc": "During each of your Standby Phases, put 1 A-Counter on 1 face-up monster your opponent controls."
-# }
-# card_list = [card_1, card_2]
 
 
 @pytest.fixture()
@@ -57,11 +43,6 @@ def create_control_files():
     with open('card_jsons/1_card_no_id.json', 'r') as f:
         malformed_card = json.load(f)
 
-    print(two_card_list)
-    # pprint(single_card)
-    # print(four_card_list)
-    # print(malformed_card)
-
 
 @pytest.fixture(scope="session", autouse=True)
 def cleanup_and_setup_db():
@@ -77,7 +58,7 @@ def cleanup_and_setup_db():
 def insert_basic_data():
     with open('card_jsons/4_cards_correct.json', 'r') as f:
         card_json = json.load(f)
-        logger.debug(card_json)
+        # logger.debug(card_json)
     cursor.insert_many(card_json)
 
 
@@ -127,12 +108,17 @@ class TestYGOCardDBService:
         assert actual["id"] == 1861629
         assert actual["name"] == "Decode Talker"
 
-    def test_insert_cards(self):
-        pprint(two_card_list)
-        ygodb.insert_cards(two_card_list)
-        actual = cursor.find(two_card_list)
-        pprint(actual)
-        assert actual == two_card_list
+    def test_populate_database(self, cleanup_db):
+        api_requests.populate_card_info_db(ygodb)
+        actual_card_count = cursor.estimated_document_count()
+        assert actual_card_count > 10495
+
+    # def test_insert_cards(self):
+    #     pprint(two_card_list)
+    #     ygodb.insert_cards(two_card_list)
+    #     actual = cursor.find(two_card_list)
+    #     pprint(actual)
+    #     assert actual == two_card_list
 
     # def test_insert_card_info(self, cleanup_db):
     #     pass

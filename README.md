@@ -19,7 +19,7 @@ Go to the src/client/ directory then run `npm start`
 # Server-Client Python Demo
 
 Go to src/server/ and run `python3 server.py`
-Then on another terminal go to src/server/ and run `python3 client.py`
+Then on another terminal go to src/client/ and run `python3 client.py`
 
 3 Clients will join a room that the server can show via `list` and `room #`
 

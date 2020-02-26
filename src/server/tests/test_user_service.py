@@ -12,7 +12,9 @@ TEST_DB_PORT = 27017
 TEST_DB_HOST = 'localhost'
 TEST_DB_URL = f'mongodb://{TEST_DB_HOST}:{TEST_DB_PORT}'
 VALID_USER = 'user1'
+VALID_USER_2 = 'hiphophippotomas'
 VALID_PASSWORD = 'peopleareangry1'
+VALID_PASSWORD_2 = '&4/9Fp`-'
 WRONG_PASSWORD = '0921'
 client = None
 db = None
@@ -50,7 +52,7 @@ class TestUserAccountService:
         assert resp == strings.SUCCESS
         resp = service.insert_new_user(VALID_USER, VALID_PASSWORD)
         assert resp == strings.USERNAME_TAKEN
-        resp = service.insert_new_user('user2', 'simplepw')
+        resp = service.insert_new_user(VALID_USER_2, VALID_PASSWORD_2)
         assert resp == strings.SUCCESS
 
     def test_get_collection(self):
@@ -69,18 +71,40 @@ class TestUserAccountService:
         assert resp == strings.SUCCESS
         resp = service.login_user(VALID_USER, VALID_PASSWORD)
         actual = cursor.find_one({"username": VALID_USER})
-        assert actual['username'] == resp.username
-        assert actual['password'] == resp.key
+        assert actual["username"] == resp["username"]
+        assert actual["password"] == resp["password"]
 
     def test_valid_username_wrong_pwd(self):
         resp = service.login_user(VALID_USER, WRONG_PASSWORD)
         assert resp == strings.INCORRECT_PASSWORD
 
-    def test_invalid_username_valid_pwd(self):
-        pass
+    def test_delete_user(self, cleanup_db):
+        resp = service.insert_new_user(VALID_USER, VALID_PASSWORD)
+        assert resp == strings.SUCCESS
+        resp = service.delete_user(VALID_USER)
+        assert resp == strings.SUCCESS
+        resp = service.delete_user('fakeuser')
+        assert resp == strings.USER_NOT_FOUND
 
-    def test_invalid_username_invalid_pwd(self):
-        pass
+    def test_reset_password(self, cleanup_db):
+        resp = service.insert_new_user(VALID_USER, WRONG_PASSWORD)
+        assert resp == strings.SUCCESS
 
-    def test_signup_weird_chars_username(self):
-        pass
+        user_orig = service.get_user(VALID_USER)
+
+        resp = service.reset_password(VALID_USER, VALID_PASSWORD)
+        assert resp == strings.SUCCESS
+
+        user_after = service.get_user(VALID_USER)
+
+        assert user_orig["password"] != user_after["password"]
+        assert user_orig["_id"] == user_after["_id"]
+
+    # def test_invalid_username_valid_pwd(self):
+    #     pass
+
+    # def test_invalid_username_invalid_pwd(self):
+    #     pass
+
+    # def test_signup_weird_chars_username(self):
+    #     pass

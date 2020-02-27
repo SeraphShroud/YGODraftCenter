@@ -7,26 +7,26 @@ First install the following:
 Then in the directory you want the project in, `git clone https://github.com/SeraphShroud/ygodraftcenter.git`
 
 Please install the dependencies in the requirements.txt before running
-### `pip3 install -r requirements.txt`
+`pip3 install -r requirements.txt`
 
 
-## How to run
+# How to run
 
 Currently there are 3 executable parts of this codebase.
 
-# Front-end React API Retrieval Demo
+## Front-end React API Retrieval Demo
 
 Go to the src/client/ directory then run `npm start`
 * Currently not working! You will need to remove the client/ directory and move all the files up to src/ as a workaround.
 
-# Server-Client Python Demo
+## Server-Client Python Demo
 
 Go to src/server/ and run `python3 server.py`
 Then on another terminal go to src/client/ and run `python3 client.py`
 
 3 Clients will join a room that the server can show via `list` and `room #`
 
-# API-Server Pytests
+## API-Server Pytests
 
 Go to src/server/tests and run `pytest`
 

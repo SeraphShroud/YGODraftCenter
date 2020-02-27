@@ -8,6 +8,7 @@
 import os
 import logging
 import strings
+import hashlib
 from mongodb_service import MongoDBService
 from user import User
 
@@ -20,10 +21,12 @@ class UserAccountDBService(MongoDBService):
         self._cursor = self._database[collection]
         self._collection = collection
         self._salt = os.urandom(32)
-        self._key = None
 
     def __str__(self):
         return f"Client: {self._client} Database: {self._database} Collection: {self._collection} Cursor: {self._cursor}"
+
+    def encrypt_password(self, password):
+        return hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), self._salt, 100000)
 
     def get_collection(self) -> list:
         resp_list = []
@@ -35,11 +38,12 @@ class UserAccountDBService(MongoDBService):
         user = self._cursor.find_one({"username": username})
         return user
 
-    def insert_new_user(self, username, password):
+    def insert_new_user(self, username, password) :
         if self.check_existing_user(username) is True:
             logger.info(f"Username '{username}' was already taken")
             return strings.USERNAME_TAKEN
-        user = User(username, password, self._salt)
+        hashed_password = self.encrypt_password(password)
+        user = User(username, hashed_password)
         self._cursor.insert_one(user.to_json())
         logger.info(f"Created user: '{username}'")
         return strings.SUCCESS
@@ -53,22 +57,31 @@ class UserAccountDBService(MongoDBService):
 
     def login_user(self, username, password):
         if self.check_existing_user(username) is True:
-            user = User(username, password, self._salt)
-            given_password = user.encrypt_password(password)
-            stored_password = self._cursor.find_one({"username": username})["password"]
+            hashed_password = self.encrypt_password(password)
+            user_json = self._cursor.find_one({"username": username})
             # logger.debug(f"Given password: {given_password}, Stored password: {stored_password}")
-            if given_password == stored_password:
-                return user
+            if hashed_password == user_json["password"]:
+                return user_json
             else:
                 return strings.INCORRECT_PASSWORD
         else:
             return strings.USER_NOT_FOUND
 
-    def delete_user(self):
-        pass
+    def delete_user(self, username):
+        if self.check_existing_user(username) is True:
+            self._cursor.delete_one({"username": username})
+            return strings.SUCCESS
+        else:
+            return strings.USER_NOT_FOUND
 
-    def reset_password(self):
-        pass
+    def reset_password(self, username, new_password):
+        if self.check_existing_user(username) is True:
+            hashed_password = self.encrypt_password(new_password)
+            primary_key = {"username": username}
+            new_values = {"$set": {"password": hashed_password}}
+            upsert = True
 
-    def verify_user(self):
-        pass
+            self._cursor.update_one(primary_key, new_values, upsert)
+            return strings.SUCCESS
+        else:
+            return strings.USER_NOT_FOUND

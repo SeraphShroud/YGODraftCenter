@@ -31,4 +31,4 @@ class MongoDBService:
         self._database = self._client[database_name]
 
     def __str__(self):
-        return f"Client: {self._client}\nDatabase: {self._database}"
+        return f"Client: {self._client} Database: {self._database}"

@@ -1,5 +1,8 @@
 ## Dependencies
-First install node.js https://nodejs.org/en/ 
+First install the following:
+1) node.js        https://nodejs.org/en/
+2) Python 3.7.6   https://www.python.org/downloads/
+3) MongoDB 4.2.3  https://www.mongodb.com/download-center/community
 
 Then in the directory you want the project in, `git clone https://github.com/SeraphShroud/ygodraftcenter.git`
 
@@ -19,7 +22,7 @@ Go to the src/client/ directory then run `npm start`
 # Server-Client Python Demo
 
 Go to src/server/ and run `python3 server.py`
-Then on another terminal go to src/server/ and run `python3 client.py`
+Then on another terminal go to src/client/ and run `python3 client.py`
 
 3 Clients will join a room that the server can show via `list` and `room #`
 

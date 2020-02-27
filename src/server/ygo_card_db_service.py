@@ -8,7 +8,7 @@ class YGOCardDBService(MongoDBService):
         self._collection = collection
 
     def __str__(self):
-        return f"Client: {self._client}\nDatabase: {self._database}\nCollection: {self._collection}\nCursor: {self._cursor}"
+        return f"Client: {self._client} Database: {self._database} Collection: {self._collection} Cursor: {self._cursor}"
 
     def get_collection(self) -> list:
         resp_list = []

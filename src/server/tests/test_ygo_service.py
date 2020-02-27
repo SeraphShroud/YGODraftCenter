@@ -120,11 +120,5 @@ class TestYGOCardDBService:
     #     pprint(actual)
     #     assert actual == two_card_list
 
-    # def test_insert_card_info(self, cleanup_db):
-    #     pass
-
-    # def test_insert_cards(self):
-    #     pass
-
     # def test_delete_card_info(self):
     #     pass

@@ -26,7 +26,7 @@ transactions                transactions
 
 
 class MongoDBService:
-    def __init__(self, database_name, db_url):
+    def __init__(self, database_name: str, db_url: str):
         self._client = MongoClient(db_url)
         self._database = self._client[database_name]
 

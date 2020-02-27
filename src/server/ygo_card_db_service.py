@@ -11,10 +11,7 @@ class YGOCardDBService(MongoDBService):
         return f"Client: {self._client} Database: {self._database} Collection: {self._collection} Cursor: {self._cursor}"
 
     def get_collection(self) -> list:
-        resp_list = []
-        for document in self._cursor.find():
-            resp_list.append(document)
-        return resp_list
+        return [document for document in self._cursor.find()]
 
     def get_card_list(self, id_list: list) -> list:
         """
@@ -29,11 +26,7 @@ class YGOCardDBService(MongoDBService):
         Return:
             card_list (list): a list of dictionaries for the card information
         """
-        card_list = []
-        result = self._cursor.find({"id": {"$in": id_list}})
-        for card in result:
-            card_list.append(card)
-        return card_list
+        return [card for card in self._cursor.find({"id": {"$in": id_list}})]
 
     def insert_card_info(self, card: dict):
         """

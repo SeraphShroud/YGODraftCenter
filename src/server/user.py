@@ -1,5 +1,5 @@
 class User:
-    def __init__(self, username, hashed_password):
+    def __init__(self, username: str, hashed_password: bytes):
         self._username = username
         self._key = hashed_password
 
@@ -22,7 +22,7 @@ class User:
     def __str__(self):
         return f'Username: {self._username} Key: {self._key}'
 
-    def to_json(self):
+    def to_json(self) -> dict:
         json = {
             "username": self._username,
             "password": self._key,

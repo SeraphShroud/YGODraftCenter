@@ -5,7 +5,6 @@
         This class holds the basic information to access the USERS database.
         Each user is represented by the User class which this class manages.
 """
-import os
 import logging
 import strings
 import hashlib
@@ -25,20 +24,17 @@ class UserAccountDBService(MongoDBService):
     def __str__(self):
         return f"Client: {self._client} Database: {self._database} Collection: {self._collection} Cursor: {self._cursor}"
 
-    def encrypt_password(self, password):
+    def encrypt_password(self, password: str) -> bytes:
         return hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), self._salt, 100000)
 
     def get_collection(self) -> list:
-        resp_list = []
-        for document in self._cursor.find():
-            resp_list.append(document)
-        return resp_list
+        return [document for document in self._cursor.find()]
 
-    def get_user(self, username):
+    def get_user(self, username: str) -> dict:
         user = self._cursor.find_one({"username": username})
         return user
 
-    def insert_new_user(self, username, password) :
+    def insert_new_user(self, username: str, password: str) -> str:
         if self.check_existing_user(username) is True:
             logger.info(f"Username '{username}' was already taken")
             return strings.USERNAME_TAKEN
@@ -48,14 +44,14 @@ class UserAccountDBService(MongoDBService):
         logger.info(f"Created user: '{username}'")
         return strings.SUCCESS
 
-    def check_existing_user(self, username):
+    def check_existing_user(self, username: str) -> bool:
         found_existing_user = self._cursor.count_documents({"username": username}, limit=1)
         if found_existing_user == 0:
             return False
         else:
             return True
 
-    def login_user(self, username, password):
+    def login_user(self, username: str, password: str) -> dict:
         if self.check_existing_user(username) is True:
             hashed_password = self.encrypt_password(password)
             user_json = self._cursor.find_one({"username": username})
@@ -67,14 +63,14 @@ class UserAccountDBService(MongoDBService):
         else:
             return strings.USER_NOT_FOUND
 
-    def delete_user(self, username):
+    def delete_user(self, username: str) -> str:
         if self.check_existing_user(username) is True:
             self._cursor.delete_one({"username": username})
             return strings.SUCCESS
         else:
             return strings.USER_NOT_FOUND
 
-    def reset_password(self, username, new_password):
+    def reset_password(self, username: str, new_password: str) -> str:
         if self.check_existing_user(username) is True:
             hashed_password = self.encrypt_password(new_password)
             primary_key = {"username": username}

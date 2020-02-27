@@ -4,10 +4,8 @@ import argparse
 import socket
 import json
 import time
-import api_requests
 from threading import Thread, Lock
 from rooms import Rooms, RoomNotFound, NotInRoom, RoomFull
-from ygo_card_db_service import YGOCardDBService
 
 
 def main_loop(tcp_port, udp_port, rooms):

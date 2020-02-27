@@ -1,8 +1,0 @@
-2020 Feb 25 16:16:42.352  test_encrypt_password    :24   [INFO ] -- Username: test123 Password: passw0rd5 Salt: b']\x88\x90`w\xee\x90^\x87\x83\x12\xdf\xbe\xce\xfe\x17\x15z\xaa\xb8\xe3\xc9GTj\nm\xa0\x06-\x84\x9b' Key: b'\xf0\x16l\xa8\xc7\xef\x91\x87-\x81X\xef\xa5{Q[Z\x84\xb0L+\xfb\xf9xM\xa6\x80\x0c\xce\xd8\xc6g'
-2020 Feb 25 16:16:42.504  insert_new_user          :44   [INFO ] -- Created user: 'user1'
-2020 Feb 25 16:16:42.611  insert_new_user          :44   [INFO ] -- Created user: 'user1'
-2020 Feb 25 16:16:42.613  insert_new_user          :40   [INFO ] -- Username 'user1' was already taken
-2020 Feb 25 16:16:42.659  insert_new_user          :44   [INFO ] -- Created user: 'user2'
-2020 Feb 25 16:16:42.762  insert_new_user          :44   [INFO ] -- Created user: 'user1'
-2020 Feb 25 16:16:43.109  _new_conn                :959  [DEBUG] -- Starting new HTTPS connection (1): db.ygoprodeck.com:443
-2020 Feb 25 16:16:44.030  _make_request            :437  [DEBUG] -- https://db.ygoprodeck.com:443 "GET /api/v6/cardinfo.php HTTP/1.1" 200 None

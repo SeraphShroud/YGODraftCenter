@@ -5,6 +5,8 @@ settings.json
 
 # Python compiled
 *.pyc
+
+# Log files
 *.log
 
 # dependencies

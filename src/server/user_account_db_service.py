@@ -20,7 +20,7 @@ class UserAccountDBService(MongoDBService):
         super(UserAccountDBService, self).__init__(database_name, db_url)
         self._cursor = self._database[collection]
         self._collection = collection
-        self._salt = os.urandom(32)
+        self._salt = b'\xae\xf6\x93\xb3\x1b\x8a;o\x02\x8dC\xffN\xa4\xacJ4\xfb\xb2e!w\x0f\x1b\x15\xfb&\xc8C(\xa80'
 
     def __str__(self):
         return f"Client: {self._client} Database: {self._database} Collection: {self._collection} Cursor: {self._cursor}"

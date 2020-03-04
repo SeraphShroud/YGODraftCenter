@@ -3,6 +3,11 @@ class InvalidGameError(Exception):
     """
     pass
 
+class TooManyPlayersGameError(Exception):
+    """Raised when Game is not in registry
+    """
+    pass
+
 
 class GameManager(object):
 
@@ -11,8 +16,8 @@ class GameManager(object):
         """
         self.games = {}
         self.max_game_id = 100
-        self.players = {int, list}
-        self.max_players = 8
+        self.players = {}
+        self.max_players = 3
 
     def _get_next_game_id(self):
         """Returns next game id
@@ -82,9 +87,9 @@ class GameManager(object):
     def new_player(self, game_id):
         """creates a new player for a game 
         """
-        players = self.players.get[game_id] 
-        if len(players) >= self.max_players | len(players) == 0:
-            raise InvalidGameError
+        players = self.players[game_id] 
+        if len(players) >= self.max_players or len(players) == 0:
+            raise TooManyPlayersGameError
         
         players.append(players[-1] + 1)
         return players[-1]
@@ -94,7 +99,7 @@ class GameManager(object):
         """
         game = self.get_game(game_id)
         other_players = []
-        for player, player_handler in game:
+        for player, player_handler in game.items():
             if handler != player_handler:
                 other_players.append(player_handler)
         
@@ -110,7 +115,7 @@ class TicTacToeGameManager(GameManager):
         game_id = super().new_game(handler)
         game = self.get_game(game_id)
 
-        game["tic_tac_toe"] = TicTacToe()
+        #game["tic_tac_toe"] = TicTacToe()
         return game_id
 
 

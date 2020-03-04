@@ -10,7 +10,7 @@ from tornado.websocket import WebSocketHandler, WebSocketClosedError
 from tornado import concurrent
 from tornado import gen
 
-from src.server.game_managers import InvalidGameError
+from src.server.game_managers import InvalidGameError, TooManyPlayersGameError
 
 logger = logging.getLogger("app")
 
@@ -82,6 +82,8 @@ class TicTacToeSocketHandler(WebSocketHandler):
             try:
                 game_id = int(data.get("game_id"))
                 self.game_manager.join_game(game_id, self)
+            except TooManyPlayersGameError:
+                self.send_message(action="error", message="Max Players Met For Game Id: {}".format(data.get("game_id")))
             except (ValueError, TypeError, InvalidGameError):
                 self.send_message(action="error", message="Invalid Game Id: {}".format(data.get("game_id")))
             else:
@@ -125,10 +127,12 @@ class TicTacToeSocketHandler(WebSocketHandler):
             player_handlers = self.game_manager.get_other_players(self.game_id, self)
         except InvalidGameError:
             logging.error("Invalid Game: {0}. Cannot send pair msg: {1}".format(self.game_id, data))
+        except TooManyPlayersGameError:
+            logging.error("Max Players: {0}. Cannot send pair msg: {1}".format(self.game_id, data))
         else:
             if player_handlers:
                 for player_handler in player_handlers:
-                    paired_handler.send_message(action, **data)
+                    player_handler.send_message(action, **data)
 
 
     def send_message(self, action, **data):

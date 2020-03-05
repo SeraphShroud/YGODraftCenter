@@ -105,8 +105,8 @@ class GameManager(object):
         
         return other_players
 
-class TicTacToeGameManager(GameManager):
-    """Extends Game Manager to add methods specific to TicTacToe Game
+class DraftGameManager(GameManager):
+    """Extends Game Manager to add methods specific to Draft Game
     """
 
     def new_game(self, handler):

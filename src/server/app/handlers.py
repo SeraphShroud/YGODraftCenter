@@ -10,7 +10,7 @@ from tornado.websocket import WebSocketHandler, WebSocketClosedError
 from tornado import concurrent
 from tornado import gen
 
-from src.server.game_managers import InvalidGameError, TooManyPlayersGameError
+from src.server.app.game_managers import InvalidGameError, TooManyPlayersGameError
 
 logger = logging.getLogger("app")
 
@@ -22,14 +22,14 @@ class IndexHandler(RequestHandler):
         self.redirect('/tic-tac-toe')
 
 
-class TicTacToeHandler(RequestHandler):
+class DraftHandler(RequestHandler):
     """Render Game page
     """
     def get(self):
         self.render("tic_tac_toe.html")
 
 
-class TicTacToeSocketHandler(WebSocketHandler):
+class DraftSocketHandler(WebSocketHandler):
 
     def initialize(self, game_manager, *args, **kwargs):
         """Initialize game parameters.  Use Game Manager to register game

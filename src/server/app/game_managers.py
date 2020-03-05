@@ -1,13 +1,4 @@
-class InvalidGameError(Exception):
-    """Raised when Game is not in registry
-    """
-    pass
-
-class TooManyPlayersGameError(Exception):
-    """Raised when Game is not in registry
-    """
-    pass
-
+from src.server.app.game_exceptions import InvalidGameError, TooManyPlayersGameError
 
 class GameManager(object):
 

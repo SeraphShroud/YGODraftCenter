@@ -9,7 +9,7 @@ import tornado.web
 from tornado.options import options
 
 from src.server.config import settings
-from src.server.app.handlers import IndexHandler
+from src.server.app.handlers import IndexHandler, UploadHandler
 from src.server.app.handlers import DraftHandler, DraftSocketHandler
 from src.server.app.game_managers import DraftGameManager
 
@@ -21,8 +21,7 @@ def main():
     options.parse_command_line()
 
     # create logger for app
-    logger = logging.getLogger('app')
-    logger.setLevel(logging.INFO)
+    logger = logging.getLogger()
 
     FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     logging.basicConfig(format=FORMAT)
@@ -31,8 +30,9 @@ def main():
 
     urls = [
         (r"/$", IndexHandler),
-        (r"/tic-tac-toe$", DraftHandler),
-        (r"/tic-tac-toe/ws$", DraftSocketHandler, dict(game_manager=draft_game_manager))
+        #(r"/tic-tac-toe$", DraftHandler),
+        (r"/upload$", UploadHandler),
+        (r"/ygoserver/ws$", DraftSocketHandler, dict(game_manager=draft_game_manager))
     ]
 
     # Create Tornado application

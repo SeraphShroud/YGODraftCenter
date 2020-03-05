@@ -10,16 +10,16 @@ from tornado.websocket import WebSocketHandler, WebSocketClosedError
 from tornado import concurrent
 from tornado import gen
 
-from src.server.app.game_managers import InvalidGameError, TooManyPlayersGameError
+from src.server.app.game_exceptions import InvalidGameError, TooManyPlayersGameError
 
-logger = logging.getLogger("app")
+logger = logging.getLogger()
 
 
 class IndexHandler(RequestHandler):
     """Redirect to Tic-Tac-Toe
     """
     def get(self):
-        self.redirect('/tic-tac-toe')
+        self.redirect('/ygoserver')
 
 
 class DraftHandler(RequestHandler):
@@ -27,6 +27,12 @@ class DraftHandler(RequestHandler):
     """
     def get(self):
         self.render("tic_tac_toe.html")
+
+class UploadHandler(RequestHandler):
+    def post(self):
+        file1 = self.request.files['file1'][0]
+        ydk_file = file1['body']
+        #need to parse ydk file
 
 
 class DraftSocketHandler(WebSocketHandler):
@@ -106,6 +112,7 @@ class DraftSocketHandler(WebSocketHandler):
             self.send_message(action="end", game_id=self.game_id, result="A")
             self.send_pair_message(action="end", game_id=self.game_id, result="A")
             self.game_manager.end_game(self.game_id)
+
         else:
             self.send_message(action="error", message="Unknown Action: {}".format(action))
 

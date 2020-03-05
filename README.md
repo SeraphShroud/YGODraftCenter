@@ -19,12 +19,11 @@ Currently there are 3 executable parts of this codebase.
 Go to the src/client/ directory then run `npm start`
 * Currently not working! You will need to remove the client/ directory and move all the files up to src/ as a workaround.
 
-## Server-Client Python Demo
+## Run Server
 
-Go to src/server/ and run `python3 server.py`
-Then on another terminal go to src/client/ and run `python3 client.py`
+Go to src/server/ and run `python3 run_server.py`
 
-3 Clients will join a room that the server can show via `list` and `room #`
+runs the server on http://localhost:9000
 
 ## API-Server Pytests
 

@@ -30,7 +30,7 @@ def main():
 
     urls = [
         (r"/$", IndexHandler),
-        #(r"/tic-tac-toe$", DraftHandler),
+        (r"/ygoserver$", DraftHandler),
         (r"/upload$", UploadHandler),
         (r"/ygoserver/ws$", DraftSocketHandler, dict(game_manager=draft_game_manager))
     ]

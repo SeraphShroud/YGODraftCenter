@@ -10,6 +10,7 @@ from tornado.websocket import WebSocketHandler, WebSocketClosedError
 from tornado import concurrent
 from tornado import gen
 
+from models.draft_params import DraftParams
 from app.game_exceptions import InvalidGameError, TooManyPlayersGameError
 
 logger = logging.getLogger()
@@ -26,15 +27,15 @@ class DraftHandler(RequestHandler):
     """Render Game page
     """
     def get(self):
-        self.render("tic_tac_toe.html")
+        self.render("fileUpload.html")
 
 class UploadHandler(RequestHandler):
     def post(self):
-        file1 = self.request.files['file1'][0]
+        file1 = self.request.files['filearg'][0]
         ydk_file = file1['body']
         ydk_list = ydk_file.splitlines()
+        logger.info(ydk_file)
         #need to parse ydk file
-
 
 class DraftSocketHandler(WebSocketHandler):
 

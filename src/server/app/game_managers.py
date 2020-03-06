@@ -1,4 +1,5 @@
 from app.game_exceptions import InvalidGameError, TooManyPlayersGameError
+from models.draft_params import DraftParams
 
 class GameManager(object):
 
@@ -9,6 +10,8 @@ class GameManager(object):
         self.max_game_id = 100
         self.players = {}
         self.max_players = 3
+        self.draft_params = {}
+        self.max_draft_params_id = 100
 
     def _get_next_game_id(self):
         """Returns next game id
@@ -17,6 +20,14 @@ class GameManager(object):
             self.max_game_id = 100
         self.max_game_id += 1
         return self.max_game_id
+
+    def _get_next_draft_param_id(self):
+        """Returns next draft param id
+        """
+        if self.max_draft_params_id > 100000:
+            self.max_draft_params_id = 100
+        self.max_draft_params_id += 1
+        return self.max_draft_params_id
 
     def new_game(self, handler):
         """Creates a new Game and returns the game id
@@ -27,6 +38,13 @@ class GameManager(object):
         }
         self.players[game_id] = [1]
         return game_id
+
+    def new_draft_param(self):
+        """Creates a new draft parameters and returns the prameter id
+        """
+        draft_param_id = self._get_next_draft_param_id()
+        self.draft_params[draft_param_id] = DraftParams()
+        return draft_param_id
 
     def join_game(self, game_id, handler):
         """Returns game_id if join is successful.

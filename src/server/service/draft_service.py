@@ -1,4 +1,4 @@
-from src.server.ygo_card_db_service import YGOCardDBService
+from service.ygo_card_db_service import YGOCardDBService
 
 class InvalidCreationError(Exception):
     """Exception Raised when Game move is not Allowed

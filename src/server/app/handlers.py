@@ -32,6 +32,7 @@ class UploadHandler(RequestHandler):
     def post(self):
         file1 = self.request.files['file1'][0]
         ydk_file = file1['body']
+        ydk_list = ydk_file.splitlines()
         #need to parse ydk file
 
 

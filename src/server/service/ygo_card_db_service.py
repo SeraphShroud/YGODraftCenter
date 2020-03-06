@@ -1,4 +1,4 @@
-from src.server.service.mongodb_service import MongoDBService
+from service.mongodb_service import MongoDBService
 
 
 class YGOCardDBService(MongoDBService):

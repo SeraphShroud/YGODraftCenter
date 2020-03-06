@@ -3,9 +3,9 @@ import json
 import logging
 import sys
 from pymongo import MongoClient
-import api_requests
 sys.path.append("..")
-from server.ygo_card_db_service import YGOCardDBService
+from service.api_requests import ApiRequest
+from service.ygo_card_db_service import YGOCardDBService
 
 logger = logging.getLogger()
 
@@ -109,7 +109,7 @@ class TestYGOCardDBService:
         assert actual["name"] == "Decode Talker"
 
     def test_populate_database(self, cleanup_db):
-        api_requests.populate_card_info_db(ygodb)
+        ApiRequest.populate_card_info_db(ygodb)
         actual_card_count = cursor.estimated_document_count()
         assert actual_card_count > 10495
 

@@ -3,8 +3,8 @@ import logging
 import sys
 from pymongo import MongoClient
 sys.path.append("..")
-import strings
-from server.user_account_db_service import UserAccountDBService
+from enums.strings import HttpResponse
+from service.user_account_db_service import UserAccountDBService
 
 TEST_DB_NAME = 'TEST_USERS_DB'
 TEST_COLLECTION_NAME = 'TEST_USERS'
@@ -42,18 +42,18 @@ def cleanup_and_setup_db():
 class TestUserAccountService:
     def test_valid_username_pwd(self):
         resp = service.insert_new_user(VALID_USER, VALID_PASSWORD)
-        assert resp == strings.SUCCESS
+        assert resp == HttpResponse.SUCCESS
         actual = cursor.find_one({"username": VALID_USER})
         assert actual["username"] == VALID_USER
         assert actual["password"] != VALID_PASSWORD
 
     def test_multiple_username_signups(self, cleanup_db):
         resp = service.insert_new_user(VALID_USER, VALID_PASSWORD)
-        assert resp == strings.SUCCESS
+        assert resp == HttpResponse.SUCCESS
         resp = service.insert_new_user(VALID_USER, VALID_PASSWORD)
-        assert resp == strings.USERNAME_TAKEN
+        assert resp == HttpResponse.USERNAME_TAKEN
         resp = service.insert_new_user(VALID_USER_2, VALID_PASSWORD_2)
-        assert resp == strings.SUCCESS
+        assert resp == HttpResponse.SUCCESS
 
     def test_get_collection(self):
         control_list = []
@@ -68,7 +68,7 @@ class TestUserAccountService:
 
     def test_successful_login(self, cleanup_db):
         resp = service.insert_new_user(VALID_USER, VALID_PASSWORD)
-        assert resp == strings.SUCCESS
+        assert resp == HttpResponse.SUCCESS
         resp = service.login_user(VALID_USER, VALID_PASSWORD)
         actual = cursor.find_one({"username": VALID_USER})
         assert actual["username"] == resp["username"]
@@ -76,24 +76,24 @@ class TestUserAccountService:
 
     def test_valid_username_wrong_pwd(self):
         resp = service.login_user(VALID_USER, WRONG_PASSWORD)
-        assert resp == strings.INCORRECT_PASSWORD
+        assert resp == HttpResponse.INCORRECT_PASSWORD
 
     def test_delete_user(self, cleanup_db):
         resp = service.insert_new_user(VALID_USER, VALID_PASSWORD)
-        assert resp == strings.SUCCESS
+        assert resp == HttpResponse.SUCCESS
         resp = service.delete_user(VALID_USER)
-        assert resp == strings.SUCCESS
+        assert resp == HttpResponse.SUCCESS
         resp = service.delete_user('fakeuser')
-        assert resp == strings.USER_NOT_FOUND
+        assert resp == HttpResponse.USER_NOT_FOUND
 
     def test_reset_password(self, cleanup_db):
         resp = service.insert_new_user(VALID_USER, WRONG_PASSWORD)
-        assert resp == strings.SUCCESS
+        assert resp == HttpResponse.SUCCESS
 
         user_orig = service.get_user(VALID_USER)
 
         resp = service.reset_password(VALID_USER, VALID_PASSWORD)
-        assert resp == strings.SUCCESS
+        assert resp == HttpResponse.SUCCESS
 
         user_after = service.get_user(VALID_USER)
 

@@ -6,9 +6,9 @@
         Each user is represented by the User class which this class manages.
 """
 import logging
-import strings
+from enums.strings import HttpResponse
 import hashlib
-from mongodb_service import MongoDBService
+from service.mongodb_service import MongoDBService
 from user import User
 
 logger = logging.getLogger()
@@ -37,12 +37,12 @@ class UserAccountDBService(MongoDBService):
     def insert_new_user(self, username: str, password: str) -> str:
         if self.check_existing_user(username) is True:
             logger.info(f"Username '{username}' was already taken")
-            return strings.USERNAME_TAKEN
+            return HttpResponse.USERNAME_TAKEN
         hashed_password = self.encrypt_password(password)
         user = User(username, hashed_password)
         self._cursor.insert_one(user.to_json())
         logger.info(f"Created user: '{username}'")
-        return strings.SUCCESS
+        return HttpResponse.SUCCESS
 
     def check_existing_user(self, username: str) -> bool:
         found_existing_user = self._cursor.count_documents({"username": username}, limit=1)
@@ -59,16 +59,16 @@ class UserAccountDBService(MongoDBService):
             if hashed_password == user_json["password"]:
                 return user_json
             else:
-                return strings.INCORRECT_PASSWORD
+                return HttpResponse.INCORRECT_PASSWORD
         else:
-            return strings.USER_NOT_FOUND
+            return HttpResponse.USER_NOT_FOUND
 
     def delete_user(self, username: str) -> str:
         if self.check_existing_user(username) is True:
             self._cursor.delete_one({"username": username})
-            return strings.SUCCESS
+            return HttpResponse.SUCCESS
         else:
-            return strings.USER_NOT_FOUND
+            return HttpResponse.USER_NOT_FOUND
 
     def reset_password(self, username: str, new_password: str) -> str:
         if self.check_existing_user(username) is True:
@@ -78,6 +78,6 @@ class UserAccountDBService(MongoDBService):
             upsert = True
 
             self._cursor.update_one(primary_key, new_values, upsert)
-            return strings.SUCCESS
+            return HttpResponse.SUCCESS
         else:
-            return strings.USER_NOT_FOUND
+            return HttpResponse.USER_NOT_FOUND

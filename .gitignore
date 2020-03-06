@@ -30,3 +30,9 @@ settings.json
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+/env/Lib/site-packages/flake8-3.7.9.dist-info
+/.vs
+/env
+/env1
+/ygodraftcenter.pyproj
+/ygodraftcenter.sln

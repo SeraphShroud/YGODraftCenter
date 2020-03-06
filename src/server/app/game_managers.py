@@ -1,4 +1,4 @@
-from src.server.app.game_exceptions import InvalidGameError, TooManyPlayersGameError
+from app.game_exceptions import InvalidGameError, TooManyPlayersGameError
 
 class GameManager(object):
 

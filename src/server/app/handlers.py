@@ -10,7 +10,7 @@ from tornado.websocket import WebSocketHandler, WebSocketClosedError
 from tornado import concurrent
 from tornado import gen
 
-from src.server.app.game_exceptions import InvalidGameError, TooManyPlayersGameError
+from app.game_exceptions import InvalidGameError, TooManyPlayersGameError
 
 logger = logging.getLogger()
 

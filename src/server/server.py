@@ -8,10 +8,10 @@ import tornado.ioloop
 import tornado.web
 from tornado.options import options
 
-from src.server.config import settings
-from src.server.app.handlers import IndexHandler, UploadHandler
-from src.server.app.handlers import DraftHandler, DraftSocketHandler
-from src.server.app.game_managers import DraftGameManager
+from config import settings
+from app.handlers import IndexHandler, UploadHandler
+from app.handlers import DraftHandler, DraftSocketHandler
+from app.game_managers import DraftGameManager
 
 def main():
     """Creates Tornado Application and starts the IO Loop

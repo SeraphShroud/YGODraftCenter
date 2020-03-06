@@ -36,3 +36,4 @@ yarn-error.log*
 /env1
 /ygodraftcenter.pyproj
 /ygodraftcenter.sln
+/src/server/templates

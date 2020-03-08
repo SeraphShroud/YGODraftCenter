@@ -11,6 +11,8 @@ from tornado import concurrent
 from tornado import gen
 
 from app.game_exceptions import InvalidGameError, TooManyPlayersGameError
+from service.ygo_card_db_service import YGOCardDBService
+from enums.strings import MongoDB
 
 logger = logging.getLogger()
 
@@ -21,7 +23,8 @@ class BaseHandler(RequestHandler):
         self.set_header("Access-Control-Allow-Origin", "*")
         self.set_header("Access-Control-Allow-Headers", "x-requested-with")
         self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
-        self.set_header("Access-Control-Allow-Headers", "access-control-allow-origin, authorization, content-type")
+        self.set_header("Access-Control-Allow-Headers",
+                        "access-control-allow-origin, authorization, content-type")
 
     def options(self):
         # no body
@@ -47,11 +50,20 @@ class DraftHandler(BaseHandler):
 
 class UploadHandler(BaseHandler):
     def post(self):
-        self.write('POST Hit')
-        args = json.loads(self.request.body.decode("utf-8"))
-        print(args)
-        # Need to figure out how to send and receive a file type for the ydk
-        self.finish()
+        ydk_file = self.request.files['file'][0]
+        deck_name, id_list = self.parse_ydk(ydk_file)
+        print(f"Deck name: {deck_name}\nID List: {id_list}")
+        card_service = YGOCardDBService(MongoDB.DB_NAME, MongoDB.CARD_COLLECTION_NAME, MongoDB.DB_URL)
+        # Currently only allows for UNIQUE id's, so need to figure out how to allow multiples of a card
+        card_info = card_service.get_card_list(id_list)
+        self.finish({'card_info': card_info})
+
+    def parse_ydk(self, ydk: dict, singleton=True) -> tuple:
+        # Need to validate the contents of the ydk to ensure it's the correct file type
+        deck_name = ydk.get('filename')
+        content_list = ydk.get('body').decode("utf-8").splitlines()
+        id_list = [int(card_id) for card_id in content_list if card_id[0].isdigit()]
+        return (deck_name, id_list)
 
 
 class DraftSocketHandler(WebSocketHandler):

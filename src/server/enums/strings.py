@@ -10,9 +10,18 @@ class HttpStatus:
     TOO_MANY_REQUESTS_STATUS_CODE = 429
     INTERNAL_ERROR_STATUS_CODE = 500
 
+
 class HttpResponse:
     # HTTP Return Strings
     SUCCESS = "Success."
     USERNAME_TAKEN = "Username already exists."
     USER_NOT_FOUND = "Username does not exist."
     INCORRECT_PASSWORD = "Password is incorrect."
+
+
+class MongoDB:
+    DB_HOST = "localhost"
+    DB_PORT = 27017
+    DB_URL = f"mongodb://{DB_HOST}:{DB_PORT}"
+    DB_NAME = "yugioh_db"
+    CARD_COLLECTION_NAME = "card_info"

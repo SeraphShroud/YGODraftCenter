@@ -28,6 +28,7 @@ class UserAccountDBService(MongoDBService):
         return hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), self._salt, 100000)
 
     def get_collection(self) -> list:
+        logger.debug(f"Retrieving Collection: {self._collection}...")
         return [document for document in self._cursor.find()]
 
     def get_user(self, username: str) -> dict:

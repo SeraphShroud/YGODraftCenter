@@ -9,7 +9,7 @@ import tornado.web
 from tornado.options import options
 
 from config import settings
-from app.handlers import IndexHandler, UploadHandler
+from app.handlers import IndexHandler, UploadHandler, UploadDraftParams
 from app.handlers import DraftHandler, DraftSocketHandler
 from app.game_managers import DraftGameManager
 
@@ -30,8 +30,9 @@ def main():
 
     urls = [
         (r"/$", IndexHandler),
-        (r"/ygoserver$", DraftHandler),
-        (r"/upload$", UploadHandler),
+        (r"/ygoserver$"),
+        (r"/upload/deck$", UploadHandler, dict(game_manager=draft_game_manager)),
+        (r"/upload/params$", UploadDraftParams, dict(game_manager=draft_game_manager)),
         (r"/ygoserver/ws$", DraftSocketHandler, dict(game_manager=draft_game_manager))
     ]
 

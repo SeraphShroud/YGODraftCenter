@@ -30,12 +30,34 @@ class DraftHandler(RequestHandler):
         self.render("fileUpload.html")
 
 class UploadHandler(RequestHandler):
+    def initialize(self, game_manager, *args, **kwargs):
+        self.game_manager = game_manager
+        self.param_id = None
+        return super().initialize(*args, **kwargs)
+
     def post(self):
         file1 = self.request.files['filearg'][0]
         ydk_file = file1['body']
         ydk_list = ydk_file.splitlines()
         logger.info(ydk_file)
         #need to parse ydk file
+        self.param_id = self.game_manager.new_draft_param()
+        self.write({'paramId': self.param_id})
+
+class UploadDraftParams(RequestHandler):
+    def initialize(self, game_manager, *args, **kwargs):
+        self.game_manager = game_manager
+        self.param_id = None
+        return super().initialize(*args, **kwargs)
+
+    def post(self):
+        data = json.load(self.request.body)
+        num_players = data.get(numPlayers)
+        round_time = data.get(roundTime)
+        pack_size = data.get(packSize)
+        self.param_id = data.get(paramId)
+        self.game_manager.ser_draft_param(num_players, round_time, pack_size, param_id)
+
 
 class DraftSocketHandler(WebSocketHandler):
 

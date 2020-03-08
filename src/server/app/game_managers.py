@@ -46,6 +46,17 @@ class GameManager(object):
         self.draft_params[draft_param_id] = DraftParams()
         return draft_param_id
 
+    def set_draft_params(self, num_players, round_time, pack_size, param_id):
+        draft_param = self.draft_params[param_id]
+        draft_param.setPlayerLength(num_players)
+        draft_param.setRoundTime(round_time)
+        draft_param.setPackSize(pack_size)
+
+    def set_draft_decks(self, main_list, extra_list, param_id):
+        draft_param = self.draft_params[param_id]
+        draft_param.setMainList(main_list)
+        draft_param.setExtraList(extra_list)
+
     def join_game(self, game_id, handler):
         """Returns game_id if join is successful.
         Raises InvalidGame when it could not join the game

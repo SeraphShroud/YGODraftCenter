@@ -1,5 +1,6 @@
 from app.game_exceptions import InvalidGameError, TooManyPlayersGameError
 
+
 class GameManager(object):
 
     def __init__(self):
@@ -23,7 +24,7 @@ class GameManager(object):
         """
         game_id = self._get_next_game_id()
         self.games[game_id] = {
-            1 : handler
+            1: handler
         }
         self.players[game_id] = [1]
         return game_id
@@ -58,7 +59,6 @@ class GameManager(object):
         else:
             raise InvalidGameError
 
-    
     def get_game(self, game_id):
         """Returns the game instance.  Raises Error when game not found
         """
@@ -78,10 +78,10 @@ class GameManager(object):
     def new_player(self, game_id):
         """creates a new player for a game 
         """
-        players = self.players[game_id] 
+        players = self.players[game_id]
         if len(players) >= self.max_players or len(players) == 0:
             raise TooManyPlayersGameError
-        
+
         players.append(players[-1] + 1)
         return players[-1]
 
@@ -93,8 +93,9 @@ class GameManager(object):
         for player, player_handler in game.items():
             if handler != player_handler:
                 other_players.append(player_handler)
-        
+
         return other_players
+
 
 class DraftGameManager(GameManager):
     """Extends Game Manager to add methods specific to Draft Game
@@ -109,7 +110,6 @@ class DraftGameManager(GameManager):
         #game["tic_tac_toe"] = TicTacToe()
         return game_id
 
-
     def record_move(self, game_id, selection, handler):
         """Record the move onto tic_tac_toe instance
         """
@@ -118,7 +118,6 @@ class DraftGameManager(GameManager):
             game["tic_tac_toe"].record_player_a_move(selection)
         elif handler == game.get("handler_b"):
             game["tic_tac_toe"].record_player_b_move(selection)
-
 
     def abort_game(self, game_id):
         """Aborts the game

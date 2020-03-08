@@ -15,25 +15,43 @@ from app.game_exceptions import InvalidGameError, TooManyPlayersGameError
 logger = logging.getLogger()
 
 
-class IndexHandler(RequestHandler):
+class BaseHandler(RequestHandler):
+    def set_default_headers(self):
+        logger.debug("Setting CORS headers")
+        self.set_header("Access-Control-Allow-Origin", "*")
+        self.set_header("Access-Control-Allow-Headers", "x-requested-with")
+        self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
+        self.set_header("Access-Control-Allow-Headers", "access-control-allow-origin, authorization, content-type")
+
+    def options(self):
+        # no body
+        self.set_status(204)
+        self.finish()
+
+
+class IndexHandler(BaseHandler):
     """Redirect to Tic-Tac-Toe
     """
+
     def get(self):
         self.redirect('/ygoserver')
 
 
-class DraftHandler(RequestHandler):
+class DraftHandler(BaseHandler):
     """Render Game page
     """
-    def get(self):
-        self.render("tic_tac_toe.html")
 
-class UploadHandler(RequestHandler):
+    def get(self):
+        self.render("../client/login.html")
+
+
+class UploadHandler(BaseHandler):
     def post(self):
-        file1 = self.request.files['file1'][0]
-        ydk_file = file1['body']
-        ydk_list = ydk_file.splitlines()
-        #need to parse ydk file
+        self.write('POST Hit')
+        args = json.loads(self.request.body.decode("utf-8"))
+        print(args)
+        # Need to figure out how to send and receive a file type for the ydk
+        self.finish()
 
 
 class DraftSocketHandler(WebSocketHandler):
@@ -49,7 +67,6 @@ class DraftSocketHandler(WebSocketHandler):
         """Opens a Socket Connection to client
         """
         self.send_message(action="open", message="Connected to Game Server")
-
 
     def on_message(self, message):
         """Respond to messages from connected client.
@@ -78,7 +95,8 @@ class DraftSocketHandler(WebSocketHandler):
 
             # Check if the game is still ON
             if self.game_manager.has_game_ended(self.game_id):
-                game_result = self.game_manager.get_game_result(self.game_id, self)
+                game_result = self.game_manager.get_game_result(
+                    self.game_id, self)
                 self.send_message(action="end", result=game_result)
                 opp_result = "L" if game_result == "W" else game_result
                 self.send_pair_message(action="end", result=opp_result)
@@ -90,9 +108,11 @@ class DraftSocketHandler(WebSocketHandler):
                 game_id = int(data.get("game_id"))
                 self.game_manager.join_game(game_id, self)
             except TooManyPlayersGameError:
-                self.send_message(action="error", message="Max Players Met For Game Id: {}".format(data.get("game_id")))
+                self.send_message(action="error", message="Max Players Met For Game Id: {}".format(
+                    data.get("game_id")))
             except (ValueError, TypeError, InvalidGameError):
-                self.send_message(action="error", message="Invalid Game Id: {}".format(data.get("game_id")))
+                self.send_message(
+                    action="error", message="Invalid Game Id: {}".format(data.get("game_id")))
             else:
                 # Joined the game.
                 self.game_id = game_id
@@ -111,12 +131,13 @@ class DraftSocketHandler(WebSocketHandler):
         elif action == "abort":
             self.game_manager.abort_game(self.game_id)
             self.send_message(action="end", game_id=self.game_id, result="A")
-            self.send_pair_message(action="end", game_id=self.game_id, result="A")
+            self.send_pair_message(
+                action="end", game_id=self.game_id, result="A")
             self.game_manager.end_game(self.game_id)
 
         else:
-            self.send_message(action="error", message="Unknown Action: {}".format(action))
-
+            self.send_message(
+                action="error", message="Unknown Action: {}".format(action))
 
     def on_close(self):
         """Overwrites WebSocketHandler.close.
@@ -132,16 +153,18 @@ class DraftSocketHandler(WebSocketHandler):
             return
         try:
             #paired_handler = self.game_manager.get_pair(self.game_id, self)
-            player_handlers = self.game_manager.get_other_players(self.game_id, self)
+            player_handlers = self.game_manager.get_other_players(
+                self.game_id, self)
         except InvalidGameError:
-            logging.error("Invalid Game: {0}. Cannot send pair msg: {1}".format(self.game_id, data))
+            logging.error(
+                "Invalid Game: {0}. Cannot send pair msg: {1}".format(self.game_id, data))
         except TooManyPlayersGameError:
-            logging.error("Max Players: {0}. Cannot send pair msg: {1}".format(self.game_id, data))
+            logging.error(
+                "Max Players: {0}. Cannot send pair msg: {1}".format(self.game_id, data))
         else:
             if player_handlers:
                 for player_handler in player_handlers:
                     player_handler.send_message(action, **data)
-
 
     def send_message(self, action, **data):
         """Sends the message to the connected client
@@ -153,7 +176,8 @@ class DraftSocketHandler(WebSocketHandler):
         try:
             self.write_message(json.dumps(message))
         except WebSocketClosedError:
-            logger.warning("WS_CLOSED", "Could Not send Message: " + json.dumps(message))
+            logger.warning(
+                "WS_CLOSED", "Could Not send Message: " + json.dumps(message))
             # Send Websocket Closed Error to Paired Opponent
             self.send_pair_message(action="pair-closed")
             self.close()

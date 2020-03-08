@@ -13,6 +13,7 @@ from app.handlers import IndexHandler, UploadHandler
 from app.handlers import DraftHandler, DraftSocketHandler
 from app.game_managers import DraftGameManager
 
+
 def main():
     """Creates Tornado Application and starts the IO Loop
     """
@@ -32,7 +33,8 @@ def main():
         (r"/$", IndexHandler),
         #(r"/tic-tac-toe$", DraftHandler),
         (r"/upload$", UploadHandler),
-        (r"/ygoserver/ws$", DraftSocketHandler, dict(game_manager=draft_game_manager))
+        (r"/ygoserver/ws$", DraftSocketHandler,
+         dict(game_manager=draft_game_manager))
     ]
 
     # Create Tornado application
@@ -43,6 +45,7 @@ def main():
         **settings)
 
     # Start Server
-    logger.info("Starting App on Port: {} with Debug Mode: {}".format(options.port, options.debug))
+    logger.info("Starting App on Port: {} with Debug Mode: {}".format(
+        options.port, options.debug))
     application.listen(options.port)
     tornado.ioloop.IOLoop.current().start()

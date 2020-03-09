@@ -19,9 +19,8 @@ function HomeNavigation(){
         <ul className="nav-links">
           <Link style={navStyle} to="/login"><li>LoginPage</li></Link>
           <Link style={navStyle} to="/carddatabase"><li>Cards</li></Link>
-          <Link style={navStyle} to="/"><li>Home</li></Link>
           <Link style={navStyle} to="/createroom"><li>CreateRoom</li></Link>
-          
+          <Link style={navStyle} to="/"><li>Home</li></Link>
         </ul>
       </nav>
     )

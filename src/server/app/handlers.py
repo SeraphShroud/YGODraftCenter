@@ -56,7 +56,11 @@ class UploadHandler(BaseHandler):
         card_service = YGOCardDBService(MongoDB.DB_NAME, MongoDB.CARD_COLLECTION_NAME, MongoDB.DB_URL)
         # Currently only allows for UNIQUE id's, so need to figure out how to allow multiples of a card
         card_info = card_service.get_card_list(id_list)
-        self.finish({'card_info': card_info})
+        self.finish({
+            'deck_name': deck_name,
+            'id_list': id_list,
+            'card_info_list': card_info
+        })
 
     def parse_ydk(self, ydk: dict, singleton=True) -> tuple:
         # Need to validate the contents of the ydk to ensure it's the correct file type

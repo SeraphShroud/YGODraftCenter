@@ -37,19 +37,11 @@ def main():
         APIRequest.populate_card_info_db(card_db_service)
 
     urls = [
-<<<<<<< HEAD
-        # (r"/$", IndexHandler),
-        # (r"/ygoserver$"),
-        (r"/upload/deck$", UploadHandler, dict(game_manager=draft_game_manager)),
-        (r"/upload/params$", UploadDraftParams, dict(game_manager=draft_game_manager)),
-        (r"/ygoserver/ws$", DraftSocketHandler, dict(game_manager=draft_game_manager))
-=======
         (r"/$", IndexHandler),
         #(r"/tic-tac-toe$", DraftHandler),
         (r"/upload$", UploadHandler),
         (r"/ygoserver/ws$", DraftSocketHandler,
          dict(game_manager=draft_game_manager))
->>>>>>> 517d6a6969b76ee3b2d96460ee92d0856dd68354
     ]
 
     # Create Tornado application

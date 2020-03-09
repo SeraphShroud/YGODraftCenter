@@ -42,41 +42,6 @@ class DraftHandler(BaseHandler):
     """
 
     def get(self):
-<<<<<<< HEAD
-        self.render("fileUpload.html")
-
-
-class UploadHandler(RequestHandler):
-    def initialize(self, game_manager, *args, **kwargs):
-        self.game_manager = game_manager
-        self.param_id = None
-        return super().initialize(*args, **kwargs)
-
-    def post(self):
-        file1 = self.request.files['filearg'][0]
-        ydk_file = file1['body']
-        ydk_list = ydk_file.splitlines()
-        logger.info(ydk_file)
-        # need to parse ydk file
-        self.param_id = self.game_manager.new_draft_param()
-        self.write({'paramId': self.param_id})
-
-
-class UploadDraftParams(RequestHandler):
-    def initialize(self, game_manager, *args, **kwargs):
-        self.game_manager = game_manager
-        self.param_id = None
-        return super().initialize(*args, **kwargs)
-
-    def post(self):
-        data = json.load(self.request.body)
-        num_players = data.get(numPlayers)
-        round_time = data.get(roundTime)
-        pack_size = data.get(packSize)
-        self.param_id = data.get(paramId)
-        self.game_manager.ser_draft_param(
-            num_players, round_time, pack_size, param_id)
-=======
         self.render("../client/login.html")
 
 
@@ -100,7 +65,6 @@ class UploadHandler(BaseHandler):
         content_list = ydk.get('body').decode("utf-8").splitlines()
         id_list = [int(card_id) for card_id in content_list if card_id[0].isdigit()]
         return (deck_name, id_list)
->>>>>>> 517d6a6969b76ee3b2d96460ee92d0856dd68354
 
 
 class DraftSocketHandler(WebSocketHandler):
@@ -201,11 +165,7 @@ class DraftSocketHandler(WebSocketHandler):
         if not self.game_id:
             return
         try:
-<<<<<<< HEAD
-            # paired_handler = self.game_manager.get_pair(self.game_id, self)
-=======
             #paired_handler = self.game_manager.get_pair(self.game_id, self)
->>>>>>> 517d6a6969b76ee3b2d96460ee92d0856dd68354
             player_handlers = self.game_manager.get_other_players(
                 self.game_id, self)
         except InvalidGameError:

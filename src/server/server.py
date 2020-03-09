@@ -29,8 +29,8 @@ def main():
     draft_game_manager = DraftGameManager()
 
     urls = [
-        (r"/$", IndexHandler),
-        (r"/ygoserver$"),
+        # (r"/$", IndexHandler),
+        # (r"/ygoserver$"),
         (r"/upload/deck$", UploadHandler, dict(game_manager=draft_game_manager)),
         (r"/upload/params$", UploadDraftParams, dict(game_manager=draft_game_manager)),
         (r"/ygoserver/ws$", DraftSocketHandler, dict(game_manager=draft_game_manager))
@@ -40,8 +40,7 @@ def main():
     application = tornado.web.Application(
         urls,
         debug=options.debug,
-        autoreload=options.debug,
-        **settings)
+        autoreload=options.debug)
 
     # Start Server
     logger.info("Starting App on Port: {} with Debug Mode: {}".format(options.port, options.debug))

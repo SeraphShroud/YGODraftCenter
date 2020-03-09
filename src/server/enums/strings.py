@@ -10,6 +10,7 @@ class HttpStatus:
     TOO_MANY_REQUESTS_STATUS_CODE = 429
     INTERNAL_ERROR_STATUS_CODE = 500
 
+
 class HttpResponse:
     # HTTP Return Strings
     SUCCESS = "Success."

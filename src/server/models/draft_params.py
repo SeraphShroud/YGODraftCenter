@@ -36,4 +36,3 @@ class DraftParams(object):
 
     def getPackSize(self):
         return self.pack_size
-

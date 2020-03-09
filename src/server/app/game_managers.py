@@ -1,8 +1,8 @@
 from app.game_exceptions import InvalidGameError, TooManyPlayersGameError
 from models.draft_params import DraftParams
 
-class GameManager(object):
 
+class GameManager(object):
     def __init__(self):
         """Records All Games in a Dictionary and create a sequence of game ids
         """
@@ -33,9 +33,7 @@ class GameManager(object):
         """Creates a new Game and returns the game id
         """
         game_id = self._get_next_game_id()
-        self.games[game_id] = {
-            1 : handler
-        }
+        self.games[game_id] = {1: handler}
         self.players[game_id] = [1]
         return game_id
 
@@ -125,6 +123,7 @@ class GameManager(object):
         
         return other_players
 
+
 class DraftGameManager(GameManager):
     """Extends Game Manager to add methods specific to Draft Game
     """
@@ -134,10 +133,8 @@ class DraftGameManager(GameManager):
         """
         game_id = super().new_game(handler)
         game = self.get_game(game_id)
-
-        #game["tic_tac_toe"] = TicTacToe()
+        # game["tic_tac_toe"] = TicTacToe()
         return game_id
-
 
     def record_move(self, game_id, selection, handler):
         """Record the move onto tic_tac_toe instance
@@ -147,8 +144,7 @@ class DraftGameManager(GameManager):
             game["tic_tac_toe"].record_player_a_move(selection)
         elif handler == game.get("handler_b"):
             game["tic_tac_toe"].record_player_b_move(selection)
-
-
+    
     def abort_game(self, game_id):
         """Aborts the game
         """

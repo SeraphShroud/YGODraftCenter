@@ -3,6 +3,7 @@ class InvalidGameError(Exception):
     """
     pass
 
+
 class TooManyPlayersGameError(Exception):
     """Raised when Game is not in registry
     """

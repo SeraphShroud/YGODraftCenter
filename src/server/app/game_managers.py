@@ -104,10 +104,10 @@ class GameManager(object):
     def new_player(self, game_id):
         """creates a new player for a game 
         """
-        players = self.players[game_id] 
+        players = self.players[game_id]
         if len(players) >= self.max_players or len(players) == 0:
             raise TooManyPlayersGameError
-        
+
         players.append(players[-1] + 1)
         return players[-1]
 
@@ -119,8 +119,9 @@ class GameManager(object):
         for player, player_handler in game.items():
             if handler != player_handler:
                 other_players.append(player_handler)
-        
+
         return other_players
+
 
 class DraftGameManager(GameManager):
     """Extends Game Manager to add methods specific to Draft Game

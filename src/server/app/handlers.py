@@ -8,22 +8,41 @@ import json
 from tornado.web import RequestHandler
 from tornado.websocket import WebSocketHandler, WebSocketClosedError
 from app.game_exceptions import InvalidGameError, TooManyPlayersGameError
+from service.ygo_card_db_service import YGOCardDBService
+from enums.strings import MongoDB
 
 logger = logging.getLogger()
 
 
-class IndexHandler(RequestHandler):
+class BaseHandler(RequestHandler):
+    def set_default_headers(self):
+        logger.debug("Setting CORS headers")
+        self.set_header("Access-Control-Allow-Origin", "*")
+        self.set_header("Access-Control-Allow-Headers", "x-requested-with")
+        self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
+        self.set_header("Access-Control-Allow-Headers",
+                        "access-control-allow-origin, authorization, content-type")
+
+    def options(self):
+        # no body
+        self.set_status(204)
+        self.finish()
+
+
+class IndexHandler(BaseHandler):
     """Redirect to Tic-Tac-Toe
     """
+
     def get(self):
         self.redirect('/ygoserver')
 
 
-class DraftHandler(RequestHandler):
+class DraftHandler(BaseHandler):
     """Render Game page
     """
 
     def get(self):
+<<<<<<< HEAD
         self.render("fileUpload.html")
 
 
@@ -57,6 +76,31 @@ class UploadDraftParams(RequestHandler):
         self.param_id = data.get(paramId)
         self.game_manager.ser_draft_param(
             num_players, round_time, pack_size, param_id)
+=======
+        self.render("../client/login.html")
+
+
+class UploadHandler(BaseHandler):
+    def post(self):
+        ydk_file = self.request.files['file'][0]
+        deck_name, id_list = self.parse_ydk(ydk_file)
+        print(f"Deck name: {deck_name}\nID List: {id_list}")
+        card_service = YGOCardDBService(MongoDB.DB_NAME, MongoDB.CARD_COLLECTION_NAME, MongoDB.DB_URL)
+        # Currently only allows for UNIQUE id's, so need to figure out how to allow multiples of a card
+        card_info = card_service.get_card_list(id_list)
+        self.finish({
+            'deck_name': deck_name,
+            'id_list': id_list,
+            'card_info_list': card_info
+        })
+
+    def parse_ydk(self, ydk: dict, singleton=True) -> tuple:
+        # Need to validate the contents of the ydk to ensure it's the correct file type
+        deck_name = ydk.get('filename')
+        content_list = ydk.get('body').decode("utf-8").splitlines()
+        id_list = [int(card_id) for card_id in content_list if card_id[0].isdigit()]
+        return (deck_name, id_list)
+>>>>>>> 517d6a6969b76ee3b2d96460ee92d0856dd68354
 
 
 class DraftSocketHandler(WebSocketHandler):
@@ -136,7 +180,8 @@ class DraftSocketHandler(WebSocketHandler):
         elif action == "abort":
             self.game_manager.abort_game(self.game_id)
             self.send_message(action="end", game_id=self.game_id, result="A")
-            self.send_pair_message(action="end", game_id=self.game_id, result="A")
+            self.send_pair_message(
+                action="end", game_id=self.game_id, result="A")
             self.game_manager.end_game(self.game_id)
 
         else:
@@ -156,13 +201,19 @@ class DraftSocketHandler(WebSocketHandler):
         if not self.game_id:
             return
         try:
+<<<<<<< HEAD
             # paired_handler = self.game_manager.get_pair(self.game_id, self)
+=======
+            #paired_handler = self.game_manager.get_pair(self.game_id, self)
+>>>>>>> 517d6a6969b76ee3b2d96460ee92d0856dd68354
             player_handlers = self.game_manager.get_other_players(
                 self.game_id, self)
         except InvalidGameError:
-            logging.error("Invalid Game: {0}. Cannot send pair msg: {1}".format(self.game_id, data))
+            logging.error(
+                "Invalid Game: {0}. Cannot send pair msg: {1}".format(self.game_id, data))
         except TooManyPlayersGameError:
-            logging.error("Max Players: {0}. Cannot send pair msg: {1}".format(self.game_id, data))
+            logging.error(
+                "Max Players: {0}. Cannot send pair msg: {1}".format(self.game_id, data))
         else:
             if player_handlers:
                 for player_handler in player_handlers:

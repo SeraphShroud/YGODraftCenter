@@ -1,4 +1,7 @@
+import logging
 from service.mongodb_service import MongoDBService
+
+logger = logging.getLogger()
 
 
 class YGOCardDBService(MongoDBService):
@@ -11,6 +14,7 @@ class YGOCardDBService(MongoDBService):
         return f"Client: {self._client} Database: {self._database} Collection: {self._collection} Cursor: {self._cursor}"
 
     def get_collection(self) -> list:
+        logger.debug(f"Retrieving Collection: {self._collection}...")
         return [document for document in self._cursor.find()]
 
     def get_card_list(self, id_list: list) -> list:
@@ -26,7 +30,7 @@ class YGOCardDBService(MongoDBService):
         Return:
             card_list (list): a list of dictionaries for the card information
         """
-        return [card for card in self._cursor.find({"id": {"$in": id_list}})]
+        return [card for card in self._cursor.find({"id": {"$in": id_list}}, {'_id': False})]
 
     def insert_card_info(self, card: dict):
         """

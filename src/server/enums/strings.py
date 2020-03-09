@@ -17,3 +17,11 @@ class HttpResponse:
     USERNAME_TAKEN = "Username already exists."
     USER_NOT_FOUND = "Username does not exist."
     INCORRECT_PASSWORD = "Password is incorrect."
+
+
+class MongoDB:
+    DB_HOST = "localhost"
+    DB_PORT = 27017
+    DB_URL = f"mongodb://{DB_HOST}:{DB_PORT}"
+    DB_NAME = "yugioh_db"
+    CARD_COLLECTION_NAME = "card_info"

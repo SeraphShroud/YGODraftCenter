@@ -15,7 +15,6 @@ logger = logging.getLogger()
 class IndexHandler(RequestHandler):
     """Redirect to Tic-Tac-Toe
     """
-
     def get(self):
         self.redirect('/ygoserver')
 

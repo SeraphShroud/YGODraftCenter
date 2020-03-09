@@ -9,7 +9,11 @@ import tornado.web
 from tornado.options import options
 
 from config import settings
+<<<<<<< HEAD
 from app.handlers import IndexHandler, UploadHandler, UploadDraftParams
+=======
+from app.handlers import IndexHandler, UploadHandler
+>>>>>>> 05e1a7fe24557df5678f13f65b4fbf0973386776
 from app.handlers import DraftHandler, DraftSocketHandler
 from app.game_managers import DraftGameManager
 

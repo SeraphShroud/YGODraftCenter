@@ -1,13 +1,8 @@
 from app.game_exceptions import InvalidGameError, TooManyPlayersGameError
 from models.draft_params import DraftParams
 
-<<<<<<< HEAD
 
 class GameManager(object):
-=======
-class GameManager(object):
-
->>>>>>> 05e1a7fe24557df5678f13f65b4fbf0973386776
     def __init__(self):
         """Records All Games in a Dictionary and create a sequence of game ids
         """
@@ -38,13 +33,7 @@ class GameManager(object):
         """Creates a new Game and returns the game id
         """
         game_id = self._get_next_game_id()
-<<<<<<< HEAD
         self.games[game_id] = {1: handler}
-=======
-        self.games[game_id] = {
-            1 : handler
-        }
->>>>>>> 05e1a7fe24557df5678f13f65b4fbf0973386776
         self.players[game_id] = [1]
         return game_id
 
@@ -55,7 +44,6 @@ class GameManager(object):
         self.draft_params[draft_param_id] = DraftParams()
         return draft_param_id
 
-<<<<<<< HEAD
     def set_draft_params(self, num_players, round_time, pack_size, param_id):
         draft_param = self.draft_params[param_id]
         draft_param.setPlayerLength(num_players)
@@ -67,8 +55,6 @@ class GameManager(object):
         draft_param.setMainList(main_list)
         draft_param.setExtraList(extra_list)
 
-=======
->>>>>>> 05e1a7fe24557df5678f13f65b4fbf0973386776
     def join_game(self, game_id, handler):
         """Returns game_id if join is successful.
         Raises InvalidGame when it could not join the game
@@ -98,7 +84,6 @@ class GameManager(object):
             return game.get("handler_a")
         else:
             raise InvalidGameError
-
     
     def get_game(self, game_id):
         """Returns the game instance.  Raises Error when game not found

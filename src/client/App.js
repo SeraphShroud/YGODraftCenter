@@ -1,59 +1,35 @@
 import React, { useEffect, useState } from 'react';
 import Card from './Card'
 import './App.css';
-
+import HomeNavigation from "./HomeNavigation"
+import CardDatabase from "./CardDatabase"
+import LoginPage from "./LoginPage"
+import CreateRoom from "./CreateRoom"
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom"
 const App = () => {
 
 
+  return (
+    <div className="App">
+      <Router>
+        <HomeNavigation />
+        <Switch>
+          <Route path="/login" exact component={LoginPage} />
+          <Route path="/carddatabase" component={CardDatabase} />
+          <Route path="/createroom" component={CreateRoom} />
+          <Route path="/" component={Home} />
+        </Switch>
 
-  const [cards, setCards] = useState([]);
-  const [search, setSearch] = useState("");
-  const [query, setQuery] = useState("Fish");
-
-  const CARD_QUERY = `https://db.ygoprodeck.com/api/v6/cardinfo.php?race=${query}`;
-  const CARD_SET_QUERY = 'https://db.ygoprodeck.com/api/v6/cardsetsinfo.php?setcode=SDY-046'
-
-  useEffect(() =>{
-    getCards();
-  }, [query]);
-
-  const getCards = async () => {
-    const response = await fetch(CARD_QUERY);
-    const data = await response.json();
-    // console.log(data)
-    setCards(data);
-  }
-
-  const updateSearch = e => {
-    setSearch(e.target.value);
-    console.log(search)
-  }
-
-  const getSearch = e => {
-    e.preventDefault();
-    setQuery(search);
-    setSearch("")
-  }
-
-	return (
-		<div className="App">
-			<form onSubmit={getSearch} className="search-form">
-				<input className="search-bar" type="text" value={search} onChange={updateSearch}/>
-        <button classname="search-button" type="submit">
-          Search
-        </button>
-			</form>
-      {cards.map(card => (
-        <Card
-          key={card.name}
-          name={card.name}
-          type={card.race}
-          image={card.card_images[0].image_url_small}
-        />
-      ))};
-		</div>
-	);
+      </Router>
+    </div>
+  );
 };
+
+const Home = () => (
+  <div>
+    <h1>Home</h1>
+  </div>
+)
 
 
 export default App;

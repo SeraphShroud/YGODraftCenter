@@ -12,6 +12,10 @@ from config import settings
 from app.handlers import IndexHandler, UploadHandler
 from app.handlers import DraftHandler, DraftSocketHandler
 from app.game_managers import DraftGameManager
+from service.api_requests import APIRequest
+from service.ygo_card_db_service import YGOCardDBService
+from enums.strings import MongoDB
+
 
 def main():
     """Creates Tornado Application and starts the IO Loop
@@ -28,11 +32,16 @@ def main():
 
     draft_game_manager = DraftGameManager()
 
+    card_db_service = YGOCardDBService(MongoDB.DB_NAME, MongoDB.CARD_COLLECTION_NAME, MongoDB.DB_URL)
+    if len(card_db_service.get_collection()) < 20:
+        APIRequest.populate_card_info_db(card_db_service)
+
     urls = [
         (r"/$", IndexHandler),
         #(r"/tic-tac-toe$", DraftHandler),
         (r"/upload$", UploadHandler),
-        (r"/ygoserver/ws$", DraftSocketHandler, dict(game_manager=draft_game_manager))
+        (r"/ygoserver/ws$", DraftSocketHandler,
+         dict(game_manager=draft_game_manager))
     ]
 
     # Create Tornado application
@@ -43,6 +52,6 @@ def main():
         **settings)
 
     # Start Server
-    logger.info("Starting App on Port: {} with Debug Mode: {}".format(options.port, options.debug))
+    logger.info(f"Starting App on Port: {options.port} with Debug Mode: {options.debug}")
     application.listen(options.port)
     tornado.ioloop.IOLoop.current().start()

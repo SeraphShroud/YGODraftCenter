@@ -1,5 +1,5 @@
 import logging
-from service.mongodb_service import MongoDBService
+from server.service.mongodb_service import MongoDBService
 
 logger = logging.getLogger()
 

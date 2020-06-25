@@ -1,11 +1,9 @@
 import pytest
 import json
 import logging
-import sys
 from pymongo import MongoClient
-sys.path.append("..")
-from service.api_requests import APIRequest
-from service.ygo_card_db_service import YGOCardDBService
+from server.service.api_requests import APIRequest
+from server.service.ygo_card_db_service import YGOCardDBService
 
 logger = logging.getLogger()
 

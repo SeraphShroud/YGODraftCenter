@@ -119,7 +119,7 @@ class DraftSocketHandler(WebSocketHandler):
             # Get the game id
             try:
                 game_id = int(data.get("game_id"))
-                self.game_manager.join_game(game_id, self)
+                player_id = self.game_manager.join_game(game_id, self)
             except TooManyPlayersGameError:
                 self.send_message(action="error", message="Max Players Met For Game Id: {}".format(
                     data.get("game_id")))
@@ -130,16 +130,17 @@ class DraftSocketHandler(WebSocketHandler):
                 # Joined the game.
                 self.game_id = game_id
                 # Tell both players that they have been paired, so reset the pieces
-                self.send_message(action="paired", game_id=game_id)
-                self.send_pair_message(action="paired", game_id=game_id)
+                self.send_message(action="joined", game_id=game_id, player_id=player_id)
+                self.send_pair_message(action="paired", game_id=game_id, player_id=player_id)
                 # One to wait, other to move
-                self.send_message(action="opp-move")
-                self.send_pair_message(action="move")
+                if self.game_manager.all_players_joined(game_id, player_id):
+                    self.send_message(action="game-start")
+                    self.send_pair_message(action="game-start")
 
         elif action == "new":
             # Create a new game id and respond the game id
             self.game_id = self.game_manager.new_game(self)
-            self.send_message(action="wait-pair", game_id=self.game_id)
+            self.send_message(action="wait-pair", game_id=self.game_id, player_id=0)
 
         elif action == "abort":
             self.game_manager.abort_game(self.game_id)
@@ -165,9 +166,7 @@ class DraftSocketHandler(WebSocketHandler):
         if not self.game_id:
             return
         try:
-            #paired_handler = self.game_manager.get_pair(self.game_id, self)
-            player_handlers = self.game_manager.get_other_players(
-                self.game_id, self)
+            player_handlers = self.game_manager.get_other_players(self.game_id, self)
         except InvalidGameError:
             logging.error(
                 "Invalid Game: {0}. Cannot send pair msg: {1}".format(self.game_id, data))

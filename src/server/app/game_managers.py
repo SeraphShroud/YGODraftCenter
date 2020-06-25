@@ -1,5 +1,6 @@
 from app.game_exceptions import InvalidGameError, TooManyPlayersGameError
 from models.draft_params import DraftParams
+from service.draft_service import DraftService
 
 
 class GameManager(object):
@@ -33,8 +34,8 @@ class GameManager(object):
         """Creates a new Game and returns the game id
         """
         game_id = self._get_next_game_id()
-        self.games[game_id] = {1: handler}
-        self.players[game_id] = [1]
+        self.games[game_id] = {0: handler}
+        self.players[game_id] = [0]
         return game_id
 
     def new_draft_param(self):
@@ -55,15 +56,18 @@ class GameManager(object):
         draft_param.setMainList(main_list)
         draft_param.setExtraList(extra_list)
 
+    def get_draft_param(self, param_id):
+        return self.draft_params[param_id]
+
     def join_game(self, game_id, handler):
-        """Returns game_id if join is successful.
+        """Returns player_id if join is successful.
         Raises InvalidGame when it could not join the game
         """
         game = self.get_game(game_id)
-        player = self.new_player(game_id)
-        if game.get(player) is None:
-            game[player] = handler
-            return game_id
+        player_id = self.new_player(game_id)
+        if game.get(player_id) is None:
+            game[player_id] = handler
+            return player_id
         # Game ID not found.
         raise InvalidGameError
 
@@ -127,13 +131,24 @@ class DraftGameManager(GameManager):
     """Extends Game Manager to add methods specific to Draft Game
     """
 
-    def new_game(self, handler):
+    def new_game(self, handler, param_id):
         """Extend new_game with tic_tac_toe instance.
         """
         game_id = super().new_game(handler)
+        draft_param = super().get_draft_param(param_id)
         game = self.get_game(game_id)
         # game["tic_tac_toe"] = TicTacToe()
+        game["ygo_draft"] = DraftService(draft_param)
+        game["draft_param"] = draft_param
         return game_id
+
+    def all_players_joined(self, game_id, player_id):
+        game = self.get_game(game_id)
+        draft_param = game["draft_param"]
+        if player_id == draft_param.getPlayerLength():
+            return True
+        else:
+            return False
 
     def record_move(self, game_id, selection, handler):
         """Record the move onto tic_tac_toe instance

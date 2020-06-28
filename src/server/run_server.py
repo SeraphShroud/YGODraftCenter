@@ -1,7 +1,7 @@
 # !/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import server
+import draft_server
 
 if __name__ == "__main__":
-    server.main()
+    draft_server.main()

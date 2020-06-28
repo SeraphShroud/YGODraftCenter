@@ -1,5 +1,6 @@
 import random
-from server.models.draft_params import DraftParams
+from models.draft_params import DraftParams
+from enums.strings 
 
 
 class InvalidMoveError(Exception):
@@ -22,34 +23,66 @@ class DraftService:
         self.player_e_decks = {}
         self.player_m_packs = {}
         self.player_e_packs = {}
+        self.player_picked = [0 for i in range(self.max_players)]
 
     def createDraft(self):
         random.shuffle(self.main_deck_list)
         random.shuffle(self.extra_deck_list)
-        deck_i = 0
-        pack_i = self.pack_size
-        num_packs = len(self.main_deck_list) / (self.pack_size * self.max_players)
+        num_packs = int(len(self.main_deck_list) / (self.pack_size * self.max_players))
         for round in range(0, num_packs):
-            self.player_m_packs[round] = {round: []}
-            for i in range(0, self.max_players):
-                self.player_m_packs[round].append(self.main_deck_list[deck_i, pack_i])
-                deck_i += pack_i
-                pack_i += self.pack_size
-        deck_i = 0
-        num_e_packs = len(self.extra_deck_list) / (self.pack_size * self.max_players)
+            start_i = round * self.max_players
+            self.player_m_packs[round] = [self.main_deck_list[i:i + self.pack_size] for i in range(start_i, start_i + self.max_players, self.pack_size)]
+        num_e_packs = int(len(self.extra_deck_list) / (self.pack_size * self.max_players))
         for round in range(0, num_e_packs):
-            self.player_e_packs[round] = {round: []}
-            for i in range(0, self.max_players):
-                self.player_e_packs[round].append(self.extra_deck_list[deck_i, pack_i])
-                deck_i += pack_i
-                pack_i += self.pack_size
+            start_i = round * self.max_players
+            self.player_e_packs[round] = [self.extra_deck_list[i:i + self.pack_size] for i in range(start_i, start_i + self.max_players, self.pack_size)]
 
-    def get_pack(self, player_id, round):
-        return self.player_m_packs.get(round)[player_id]
+    def get_m_pack(self, player_id: int, round: int):
+        return self.player_m_packs[round][player_id]
 
-    def pick_card(self, player_id, card_id):
-        player_pack = self.player_m_packs.get(round)[player_id]
+    def get_e_pack(self, player_id: int, round: int):
+        return self.player_e_packs[round][player_id]
+
+    def pick_m_card(self, player_id: int, round: int, card_id: str):
+        player_pack = self.player_m_packs[round][player_id]
         player_pack.remove(card_id)
-        self.player_decks[player_id].append(card_id)
+        if player_id in self.player_decks:
+            self.player_decks[player_id].append(card_id)
+        else:
+            self.player_decks[player_id] = [card_id]
+        self.player_picked[player_id] = 1
+
+    def pick_e_card(self, player_id: int, round: int, card_id: str):
+        player_pack = self.player_e_packs[round][player_id]
+        player_pack.remove(card_id)
+        if player_id in self.player_decks:
+            self.player_e_decks[player_id].append(card_id)
+        else:
+            self.player_e_decks[player_id] = [card_id]
+        self.player_picked[player_id] = 1
+
+    def has_all_players_picked(self):
+        if 0 in self.player_picked:
+            return False
+        else:
+            return True
+        
+    def rotate_pack(self, round: int, direction: str):
+        round_packs = self.player_m_packs[round]
+        if direction == "right":
+            # rotate to the right
+            self.player_m_packs[round] = round_packs[-1:] + round_packs[:-1]
+        elif direction == "left":
+            # rotate to the left
+            self.player_m_packs[round] = round_packs[1:] + round_packs[:1]
+        else:
+            InvalidMoveError("direction was not set correctly")
+        # reset the player picked flags for new round
+        self.player_picked = [0 for i in range(self.max_players)]
+
+    def get_deck(self, player_id: int):
+        return self.player_decks[player_id]
+
+
         
     

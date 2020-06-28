@@ -1,6 +1,5 @@
 # !/usr/bin/env python
 # -*- coding: utf-8 -*-
-import os
 import logging
 import logging.config
 
@@ -9,7 +8,7 @@ import tornado.web
 from tornado.options import options
 
 from config import settings
-from app.handlers import IndexHandler, UploadHandler, UploadDraftParams
+from app.handlers import IndexHandler, UploadHandler
 from app.handlers import DraftHandler, DraftSocketHandler
 from app.game_managers import DraftGameManager
 from service.api_requests import APIRequest

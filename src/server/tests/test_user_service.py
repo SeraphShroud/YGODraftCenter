@@ -1,8 +1,13 @@
 import pytest
 import logging
 from pymongo import MongoClient
-from server.enums.strings import HttpResponse
-from server.service.user_account_db_service import UserAccountDBService
+import os 
+path = os.path.dirname(os.path.abspath(__file__))
+parent = os.path.dirname(path) 
+import sys
+sys.path.append(parent)
+from enums.strings import HttpResponse
+from service.user_account_db_service import UserAccountDBService
 
 TEST_DB_NAME = 'TEST_USERS_DB'
 TEST_COLLECTION_NAME = 'TEST_USERS'

@@ -2,6 +2,13 @@ import pytest
 import json
 import logging
 from pymongo import MongoClient
+import os 
+# get current directory 
+path = os.path.dirname(os.path.abspath(__file__))
+# parent directory 
+parent = os.path.dirname(path) 
+import sys
+sys.path.append(parent)
 from server.service.api_requests import APIRequest
 from server.service.ygo_card_db_service import YGOCardDBService
 

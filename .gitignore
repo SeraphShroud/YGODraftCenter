@@ -35,9 +35,9 @@ yarn-error.log*
 /env
 /env1
 /ygodraftcenter.pyproj
-<<<<<<< HEAD
 /ygodraftcenter.sln
 /src/server/templates
-=======
 /node_modules
->>>>>>> 517d6a6969b76ee3b2d96460ee92d0856dd68354
+.vscode/launch.json
+.gitignore
+

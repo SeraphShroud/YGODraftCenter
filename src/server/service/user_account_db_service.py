@@ -8,8 +8,8 @@
 import logging
 from server.enums.strings import HttpResponse
 import hashlib
-from server.service.mongodb_service import MongoDBService
-from server.user import User
+from service.mongodb_service import MongoDBService
+from user import User
 
 logger = logging.getLogger()
 

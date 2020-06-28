@@ -1,6 +1,6 @@
 import requests
 import logging
-from server.service.ygo_card_db_service import YGOCardDBService
+from service.ygo_card_db_service import YGOCardDBService
 
 logger = logging.getLogger()
 API_URL = "https://db.ygoprodeck.com/api/v6/cardinfo.php"

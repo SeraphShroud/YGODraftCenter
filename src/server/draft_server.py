@@ -38,9 +38,10 @@ def main():
     urls = [
         (r"/$", IndexHandler),
         #(r"/tic-tac-toe$", DraftHandler),
-        (r"/upload$", UploadHandler),
-        (r"/ygoserver/ws$", DraftSocketHandler,
-         dict(game_manager=draft_game_manager))
+        (r"/upload$", UploadHandler,
+         dict(game_manager=draft_game_manager, card_service=card_db_service)),
+        (r"/ygoserver/ws$$", DraftSocketHandler,
+         dict(game_manager=draft_game_manager, card_service=card_db_service))
     ]
 
     # Create Tornado application

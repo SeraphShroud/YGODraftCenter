@@ -1,6 +1,7 @@
 from app.game_exceptions import InvalidGameError, TooManyPlayersGameError
 from models.draft_params import DraftParams
-from service.draft_service import DraftService
+from service.draft_service import DraftService, InvalidMoveError
+from enums.strings import Draft, YGODraft
 
 
 class GameManager(object):
@@ -121,7 +122,7 @@ class GameManager(object):
         game = self.get_game(game_id)
         other_players = []
         for player, player_handler in game.items():
-            if handler != player_handler:
+            if handler != player_handler and isinstance(player, int):
                 other_players.append(player_handler)
 
         return other_players
@@ -138,26 +139,29 @@ class DraftGameManager(GameManager):
         draft_param = super().get_draft_param(param_id)
         game = self.get_game(game_id)
         # game["tic_tac_toe"] = TicTacToe()
-        game["ygo_draft"] = DraftService(draft_param)
-        game["draft_param"] = draft_param
+        game[YGODraft.GAME] = DraftService(draft_param)
+        game[YGODraft.GAME].createDraft()
+        game[YGODraft.PARAM] = draft_param
+        game[YGODraft.ROUND] = 0
         return game_id
 
     def all_players_joined(self, game_id, player_id):
         game = self.get_game(game_id)
-        draft_param = game["draft_param"]
-        if player_id == draft_param.getPlayerLength():
+        draft_param = game[YGODraft.PARAM]
+        if player_id == draft_param.getPlayerLength() - 1:
             return True
         else:
             return False
 
-    def record_move(self, game_id, selection, handler):
+    def record_move(self, game_id, selection, player_id):
         """Record the move onto tic_tac_toe instance
         """
         game = self.get_game(game_id)
-        if handler == game.get("handler_a"):
-            game["tic_tac_toe"].record_player_a_move(selection)
-        elif handler == game.get("handler_b"):
-            game["tic_tac_toe"].record_player_b_move(selection)
+        round = game[YGODraft.ROUND]
+        try:
+            game[YGODraft.GAME].pick_m_card(player_id, round, selection)
+        except InvalidMoveError:
+            raise InvalidGameError
     
     def abort_game(self, game_id):
         """Aborts the game
@@ -171,9 +175,9 @@ class DraftGameManager(GameManager):
         Game cound end because of them won or it's a draw or no more open positions.
         """
         game = self.get_game(game_id)
-        tic_tac_toe = game["tic_tac_toe"]
-        if tic_tac_toe.has_ended():
-            game["result"] = tic_tac_toe.game_result
+        round = game[YGODraft.ROUND]
+        ygo_draft = game[YGODraft.GAME]
+        if ygo_draft.has_ended(round):
             return True
         return False
 
@@ -194,3 +198,41 @@ class DraftGameManager(GameManager):
             return "L"
         else:
             return ""  # Game is still ON.
+
+    def has_round_ended(self, game_id):
+        game = self.get_game(game_id)
+        round = game[YGODraft.ROUND]
+        if not game[YGODraft.GAME].has_all_players_picked():
+            return False
+        if len(game[YGODraft.GAME].get_m_pack(0, round)) > 0:
+            return False
+        return True
+
+    def update_round(self, game_id):
+        game = self.get_game(game_id)
+        round = game[YGODraft.ROUND]
+        game[YGODraft.ROUND] = round + 1
+
+    def has_all_players_picked(self, game_id):
+        game = self.get_game(game_id)
+        if not game[YGODraft.GAME].has_all_players_picked():
+            return False
+        return True
+
+    def rotate_pack(self, game_id):
+        game = self.get_game(game_id)
+        round = game[YGODraft.ROUND]
+        if round % 2:
+            game[YGODraft.GAME].rotate_pack(round, "left")
+        else:
+            game[YGODraft.GAME].rotate_pack(round, "right")
+
+    def get_pack(self, game_id, player_id):
+        game = self.get_game(game_id)
+        round = game[YGODraft.ROUND]
+        return game[YGODraft.GAME].get_m_pack(player_id, round)
+
+    def get_deck(self, game_id, player_id):
+        game = self.get_game(game_id)
+        ygo_draft = game[YGODraft.GAME]
+        return ygo_draft.get_deck(player_id)

@@ -9,7 +9,8 @@ from tornado.web import RequestHandler
 from tornado.websocket import WebSocketHandler, WebSocketClosedError
 from app.game_exceptions import InvalidGameError, TooManyPlayersGameError
 from service.ygo_card_db_service import YGOCardDBService
-from enums.strings import MongoDB
+from enums.strings import Draft
+from app.game_managers import DraftGameManager
 
 logger = logging.getLogger()
 
@@ -46,14 +47,27 @@ class DraftHandler(BaseHandler):
 
 
 class UploadHandler(BaseHandler):
+    def initialize(self, game_manager: DraftGameManager, card_service: YGOCardDBService, *args, **kwargs):
+        """Initialize game parameters.  Use Game Manager to register game
+        """
+        self.game_manager = game_manager
+        super().initialize(*args, **kwargs)
+        self.card_service = card_service
+
     def post(self):
         ydk_file = self.request.files['file'][0]
+        num_players = int(self.request.body_arguments['num_players'][0])
+        round_time = int(self.request.body_arguments['round_time'][0])
+        pack_size = int(self.request.body_arguments['pack_size'][0])
         deck_name, id_list = self.parse_ydk(ydk_file)
         print(f"Deck name: {deck_name}\nID List: {id_list}")
-        card_service = YGOCardDBService(MongoDB.DB_NAME, MongoDB.CARD_COLLECTION_NAME, MongoDB.DB_URL)
         # Currently only allows for UNIQUE id's, so need to figure out how to allow multiples of a card
-        card_info = card_service.get_card_list(id_list)
+        card_info = self.card_service.get_card_list(id_list)
+        draft_param_id = self.game_manager.new_draft_param()
+        self.game_manager.set_draft_params(num_players, round_time, pack_size, draft_param_id)
+        self.game_manager.set_draft_decks(id_list, id_list, draft_param_id)
         self.finish({
+            'draft_param_id': draft_param_id,
             'deck_name': deck_name,
             'id_list': id_list,
             'card_info_list': card_info
@@ -68,12 +82,17 @@ class UploadHandler(BaseHandler):
 
 
 class DraftSocketHandler(WebSocketHandler):
+    # to only be used during testing must remove when running on production
+    def check_origin(self, origin):
+        return True
 
-    def initialize(self, game_manager, *args, **kwargs):
+    def initialize(self, game_manager: DraftGameManager, card_service: YGOCardDBService, *args, **kwargs):
         """Initialize game parameters.  Use Game Manager to register game
         """
         self.game_manager = game_manager
+        self.card_service = card_service
         self.game_id = None
+        self.player_id = None
         super().initialize(*args, **kwargs)
 
     def open(self):
@@ -102,18 +121,27 @@ class DraftSocketHandler(WebSocketHandler):
             player_selection = data.get("card_id")
             player_move = int(player_selection)
             if player_move:
-                self.game_manager.record_move(self.game_id, player_move, self)
-            self.send_message(action="opp-move")
-            self.send_pair_message(action="move", opp_move=player_selection)
+                try:
+                    self.game_manager.record_move(self.game_id, player_move, self.player_id)
+                except InvalidGameError:
+                    self.send_message(action="invalid-move", message="card is not in players pack")
+                else:
+                    self.send_message(action="opp-move")
+                    self.send_pair_message(action="move", opp_move=player_selection)
 
             # Check if the game is still ON
             if self.game_manager.has_game_ended(self.game_id):
-                game_result = self.game_manager.get_game_result(
-                    self.game_id, self)
-                self.send_message(action="end", result=game_result)
-                opp_result = "L" if game_result == "W" else game_result
-                self.send_pair_message(action="end", result=opp_result)
+                self.send_card_info("get-deck", Draft.DECK)
+                self.send_pair_card_info("get-deck", Draft.DECK)
                 self.game_manager.end_game(self.game_id)
+            if self.game_manager.has_round_ended(self.game_id):
+                self.game_manager.update_round(self.game_id)
+                self.send_card_info(action="get-pack", card_list=Draft.PACK)
+                self.send_pair_card_info(action="get-pack", card_list=Draft.PACK)
+            if self.game_manager.has_all_players_picked(self.game_id):
+                self.game_manager.rotate_pack(self.game_id)
+                self.send_card_info(action="get-pack", card_list=Draft.PACK)
+                self.send_pair_card_info(action="get-pack", card_list=Draft.PACK)
 
         elif action == "join":
             # Get the game id
@@ -129,6 +157,7 @@ class DraftSocketHandler(WebSocketHandler):
             else:
                 # Joined the game.
                 self.game_id = game_id
+                self.player_id = player_id
                 # Tell both players that they have been paired, so reset the pieces
                 self.send_message(action="joined", game_id=game_id, player_id=player_id)
                 self.send_pair_message(action="paired", game_id=game_id, player_id=player_id)
@@ -136,11 +165,15 @@ class DraftSocketHandler(WebSocketHandler):
                 if self.game_manager.all_players_joined(game_id, player_id):
                     self.send_message(action="game-start")
                     self.send_pair_message(action="game-start")
+                    self.send_card_info(action="get-pack", card_list=Draft.PACK)
+                    self.send_pair_card_info(action="get-pack", card_list=Draft.PACK)
 
         elif action == "new":
             # Create a new game id and respond the game id
-            self.game_id = self.game_manager.new_game(self)
-            self.send_message(action="wait-pair", game_id=self.game_id, player_id=0)
+            draft_param_id = int(data.get("draft_param_id"))
+            self.game_id = self.game_manager.new_game(self, draft_param_id)
+            self.player_id = 0
+            self.send_message(action="wait-pair", game_id=self.game_id, player_id=self.player_id)
 
         elif action == "abort":
             self.game_manager.abort_game(self.game_id)
@@ -193,3 +226,43 @@ class DraftSocketHandler(WebSocketHandler):
             # Send Websocket Closed Error to Paired Opponent
             self.send_pair_message(action="pair-closed")
             self.close()
+    
+    def send_card_info(self, action, card_list):
+        id_list = []
+        if card_list == Draft.PACK:
+            id_list = self.game_manager.get_pack(self.game_id, self.player_id)
+        elif card_list == Draft.DECK:
+            id_list = self.game_manager.get_deck(self.game_id, self.player_id)
+        card_info = self.card_service.get_card_list(id_list)
+        data = {}
+        data["card_info_list"] = card_info
+        message = {
+            "action": action,
+            "data": data
+        }
+        try:
+            self.write_message(json.dumps(message))
+        except WebSocketClosedError:
+            logger.warning(
+                "WS_CLOSED", "Could Not send Message: " + json.dumps(message))
+            # Send Websocket Closed Error to Paired Opponent
+            self.send_pair_message(action="pair-closed")
+            self.close()
+
+    def send_pair_card_info(self, action, card_list):
+        """Send Message to paired Handler
+        """
+        if not self.game_id:
+            return
+        try:
+            player_handlers = self.game_manager.get_other_players(self.game_id, self)
+        except InvalidGameError:
+            logging.error(
+                "Invalid Game: {0}. Cannot send pair pack info".format(self.game_id))
+        except TooManyPlayersGameError:
+            logging.error(
+                "Max Players: {0}. Cannot send pair pack info".format(self.game_id))
+        else:
+            if player_handlers:
+                for player_handler in player_handlers:
+                    player_handler.send_card_info(action, card_list)

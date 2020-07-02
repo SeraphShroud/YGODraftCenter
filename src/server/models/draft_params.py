@@ -7,32 +7,32 @@ class DraftParams(object):
         self.round_time = 0
         self.pack_size = 0
 
-    def setMainList(self, main_list):
+    def set_main_list(self, main_list):
         self.main_list = main_list
 
-    def getMainList(self):
+    def get_main_list(self):
         return self.main_list
 
-    def setExtraList(self, extra_list):
+    def set_extra_list(self, extra_list):
         self.extra_list = extra_list
 
-    def getExtraList(self):
+    def get_extra_list(self):
         return self.extra_list
 
-    def setPlayerLength(self, player_length):
+    def set_player_length(self, player_length):
         self.player_length = player_length
 
-    def getPlayerLength(self):
+    def get_player_length(self):
         return self.player_length
 
-    def setRoundTime(self, round_time):
+    def set_round_time(self, round_time):
         self.round_time = round_time
 
-    def getRoundTime(self):
+    def get_round_time(self):
         return self.round_time
 
-    def setPackSize(self, pack_size):
+    def set_pack_size(self, pack_size):
         self.pack_size = pack_size
 
-    def getPackSize(self):
+    def get_pack_size(self):
         return self.pack_size

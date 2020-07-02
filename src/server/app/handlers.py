@@ -59,13 +59,14 @@ class UploadHandler(BaseHandler):
         num_players = int(self.request.body_arguments['num_players'][0])
         round_time = int(self.request.body_arguments['round_time'][0])
         pack_size = int(self.request.body_arguments['pack_size'][0])
-        deck_name, id_list = self.parse_ydk(ydk_file)
+        deck_name, main_list, extra_list = self.parse_ydk(ydk_file)
+        id_list = main_list + extra_list
         print(f"Deck name: {deck_name}\nID List: {id_list}")
         # Currently only allows for UNIQUE id's, so need to figure out how to allow multiples of a card
         card_info = self.card_service.get_card_list(id_list)
         draft_param_id = self.game_manager.new_draft_param()
         self.game_manager.set_draft_params(num_players, round_time, pack_size, draft_param_id)
-        self.game_manager.set_draft_decks(id_list, id_list, draft_param_id)
+        self.game_manager.set_draft_decks(main_list, extra_list, draft_param_id)
         self.finish({
             'draft_param_id': draft_param_id,
             'deck_name': deck_name,
@@ -77,8 +78,15 @@ class UploadHandler(BaseHandler):
         # Need to validate the contents of the ydk to ensure it's the correct file type
         deck_name = ydk.get('filename')
         content_list = ydk.get('body').decode("utf-8").splitlines()
-        id_list = [int(card_id) for card_id in content_list if card_id[0].isdigit()]
-        return (deck_name, id_list)
+        main_list = []
+        extra_list = []
+        id_list = main_list
+        for card_id in content_list:
+            if isinstance(card_id, str) and card_id == Draft.EXTRA:
+                id_list = extra_list
+            if card_id[0].isdigit():
+                id_list.append(int(card_id))
+        return (deck_name, main_list, extra_list)
 
 
 class DraftSocketHandler(WebSocketHandler):
@@ -93,6 +101,7 @@ class DraftSocketHandler(WebSocketHandler):
         self.card_service = card_service
         self.game_id = None
         self.player_id = None
+        self.player_name = None
         super().initialize(*args, **kwargs)
 
     def open(self):
@@ -126,8 +135,8 @@ class DraftSocketHandler(WebSocketHandler):
                 except InvalidGameError:
                     self.send_message(action="invalid-move", message="card is not in players pack")
                 else:
-                    self.send_message(action="opp-move")
-                    self.send_pair_message(action="move", opp_move=player_selection)
+                    self.send_message(action="move", selection=player_selection)
+                    self.send_pair_message(action="opp-move", player_id=self.player_id, player_name=self.player_name)
 
             # Check if the game is still ON
             if self.game_manager.has_game_ended(self.game_id):
@@ -147,6 +156,7 @@ class DraftSocketHandler(WebSocketHandler):
             # Get the game id
             try:
                 game_id = int(data.get("game_id"))
+                player_name = data.get("player_name")
                 player_id = self.game_manager.join_game(game_id, self)
             except TooManyPlayersGameError:
                 self.send_message(action="error", message="Max Players Met For Game Id: {}".format(
@@ -158,9 +168,14 @@ class DraftSocketHandler(WebSocketHandler):
                 # Joined the game.
                 self.game_id = game_id
                 self.player_id = player_id
+                self.player_name = player_name
                 # Tell both players that they have been paired, so reset the pieces
-                self.send_message(action="joined", game_id=game_id, player_id=player_id)
-                self.send_pair_message(action="paired", game_id=game_id, player_id=player_id)
+                other_player = self.game_manager.get_other_players(game_id, self)
+                player_list = [player_name]
+                for player in other_player:
+                    player_list.append(player.player_name)
+                self.send_message(action="joined", game_id=game_id, player_id=player_id, joined_player=player_name, players=player_list)
+                self.send_pair_message(action="paired", game_id=game_id, player_id=player_id, joined_player=player_name, players=player_list)
                 # One to wait, other to move
                 if self.game_manager.all_players_joined(game_id, player_id):
                     self.send_message(action="game-start")
@@ -171,9 +186,11 @@ class DraftSocketHandler(WebSocketHandler):
         elif action == "new":
             # Create a new game id and respond the game id
             draft_param_id = int(data.get("draft_param_id"))
+            player_name = data.get("player_name")
+            self.player_name = player_name
             self.game_id = self.game_manager.new_game(self, draft_param_id)
             self.player_id = 0
-            self.send_message(action="wait-pair", game_id=self.game_id, player_id=self.player_id)
+            self.send_message(action="wait-pair", game_id=self.game_id, player_id=self.player_id, players=[player_name])
 
         elif action == "abort":
             self.game_manager.abort_game(self.game_id)

@@ -1,7 +1,7 @@
 from app.game_exceptions import InvalidGameError, TooManyPlayersGameError
 from models.draft_params import DraftParams
 from service.draft_service import DraftService, InvalidMoveError
-from enums.strings import Draft, YGODraft
+from enums.strings import YGODraft
 
 
 class GameManager(object):
@@ -11,7 +11,7 @@ class GameManager(object):
         self.games = {}
         self.max_game_id = 100
         self.players = {}
-        self.max_players = 3
+        self.max_players = 10000
         self.draft_params = {}
         self.max_draft_params_id = 100
 
@@ -48,14 +48,14 @@ class GameManager(object):
 
     def set_draft_params(self, num_players, round_time, pack_size, param_id):
         draft_param = self.draft_params[param_id]
-        draft_param.setPlayerLength(num_players)
-        draft_param.setRoundTime(round_time)
-        draft_param.setPackSize(pack_size)
+        draft_param.set_player_length(num_players)
+        draft_param.set_round_time(round_time)
+        draft_param.set_pack_size(pack_size)
 
     def set_draft_decks(self, main_list, extra_list, param_id):
         draft_param = self.draft_params[param_id]
-        draft_param.setMainList(main_list)
-        draft_param.setExtraList(extra_list)
+        draft_param.set_main_list(main_list)
+        draft_param.set_extra_list(extra_list)
 
     def get_draft_param(self, param_id):
         return self.draft_params[param_id]
@@ -138,9 +138,10 @@ class DraftGameManager(GameManager):
         game_id = super().new_game(handler)
         draft_param = super().get_draft_param(param_id)
         game = self.get_game(game_id)
-        # game["tic_tac_toe"] = TicTacToe()
-        game[YGODraft.GAME] = DraftService(draft_param)
-        game[YGODraft.GAME].createDraft()
+        game[YGODraft.MAIN] = DraftService(draft_param, draft_param.get_main_list())
+        game[YGODraft.EXTRA] = DraftService(draft_param, draft_param.get_extra_list())
+        game[YGODraft.GAME] = game[YGODraft.MAIN]
+        game[YGODraft.GAME].create_draft()
         game[YGODraft.PARAM] = draft_param
         game[YGODraft.ROUND] = 0
         return game_id
@@ -148,7 +149,7 @@ class DraftGameManager(GameManager):
     def all_players_joined(self, game_id, player_id):
         game = self.get_game(game_id)
         draft_param = game[YGODraft.PARAM]
-        if player_id == draft_param.getPlayerLength() - 1:
+        if player_id == draft_param.get_player_length() - 1:
             return True
         else:
             return False
@@ -159,7 +160,7 @@ class DraftGameManager(GameManager):
         game = self.get_game(game_id)
         round = game[YGODraft.ROUND]
         try:
-            game[YGODraft.GAME].pick_m_card(player_id, round, selection)
+            game[YGODraft.GAME].pick_card(player_id, round, selection)
         except InvalidMoveError:
             raise InvalidGameError
     
@@ -178,7 +179,13 @@ class DraftGameManager(GameManager):
         round = game[YGODraft.ROUND]
         ygo_draft = game[YGODraft.GAME]
         if ygo_draft.has_ended(round):
-            return True
+            # if all cards from main deck has been drafted switch to extra packs
+            if game[YGODraft.GAME] == game[YGODraft.MAIN]:
+                game[YGODraft.GAME] = game[YGODraft.EXTRA]
+                game[YGODraft.ROUND] = 0
+                return False
+            else:
+                return True
         return False
 
     def get_game_result(self, game_id, handler):
@@ -204,7 +211,7 @@ class DraftGameManager(GameManager):
         round = game[YGODraft.ROUND]
         if not game[YGODraft.GAME].has_all_players_picked():
             return False
-        if len(game[YGODraft.GAME].get_m_pack(0, round)) > 0:
+        if len(game[YGODraft.GAME].get_pack(0, round)) > 0:
             return False
         return True
 
@@ -230,7 +237,7 @@ class DraftGameManager(GameManager):
     def get_pack(self, game_id, player_id):
         game = self.get_game(game_id)
         round = game[YGODraft.ROUND]
-        return game[YGODraft.GAME].get_m_pack(player_id, round)
+        return game[YGODraft.GAME].get_pack(player_id, round)
 
     def get_deck(self, game_id, player_id):
         game = self.get_game(game_id)

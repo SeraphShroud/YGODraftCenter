@@ -31,10 +31,13 @@ class Draft:
     KEY = "draft"
     DECK = "deck"
     PACK = "pack"
+    EXTRA = "#extra"
 
 
 class YGODraft:
     ROUND = "draft_round"
     GAME = "ygo_draft"
     PARAM = "draft_param"
+    MAIN = "main_draft"
+    EXTRA = "extra_draft"
 

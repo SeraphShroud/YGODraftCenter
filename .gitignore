@@ -38,6 +38,6 @@ yarn-error.log*
 /ygodraftcenter.sln
 /src/server/templates
 /node_modules
-.vscode/launch.json
+.vscode
 .gitignore
 

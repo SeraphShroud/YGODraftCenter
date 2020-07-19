@@ -40,4 +40,5 @@ class YGODraft:
     PARAM = "draft_param"
     MAIN = "main_draft"
     EXTRA = "extra_draft"
+    NAME= "draft_name"
 

@@ -39,20 +39,18 @@ class IndexHandler(BaseHandler):
 
 
 class DraftHandler(BaseHandler):
-    """Render Game page
-    """
-
-    def get(self):
-        self.render("../client/login.html")
-
-
-class UploadHandler(BaseHandler):
     def initialize(self, game_manager: DraftGameManager, card_service: YGOCardDBService, *args, **kwargs):
         """Initialize game parameters.  Use Game Manager to register game
         """
         self.game_manager = game_manager
         super().initialize(*args, **kwargs)
         self.card_service = card_service
+
+    def get(self):
+        current_games = self.game_manager.get_all_games()
+        self.finish({
+            'current_games': current_games
+        })
 
     def post(self):
         ydk_file = self.request.files['file'][0]
@@ -187,8 +185,9 @@ class DraftSocketHandler(WebSocketHandler):
             # Create a new game id and respond the game id
             draft_param_id = int(data.get("draft_param_id"))
             player_name = data.get("player_name")
+            game_name = data.get("game_name")
             self.player_name = player_name
-            self.game_id = self.game_manager.new_game(self, draft_param_id)
+            self.game_id = self.game_manager.new_game(self, draft_param_id, game_name)
             self.player_id = 0
             self.send_message(action="wait-pair", game_id=self.game_id, player_id=self.player_id, players=[player_name])
 

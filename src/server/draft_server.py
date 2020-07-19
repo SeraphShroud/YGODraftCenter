@@ -5,9 +5,10 @@ import logging.config
 
 import tornado.ioloop
 import tornado.web
+import config
 from tornado.options import options
 
-from app.handlers import IndexHandler, UploadHandler
+from app.handlers import IndexHandler, DraftHandler
 from app.handlers import DraftSocketHandler
 from app.game_managers import DraftGameManager
 from service.api_requests import APIRequest
@@ -36,7 +37,7 @@ def main():
 
     urls = [
         (r"/$", IndexHandler),
-        (r"/upload$", UploadHandler,
+        (r"/draft$", DraftHandler,
          dict(game_manager=draft_game_manager, card_service=card_db_service)),
         (r"/ygoserver/ws$$", DraftSocketHandler,
          dict(game_manager=draft_game_manager, card_service=card_db_service))

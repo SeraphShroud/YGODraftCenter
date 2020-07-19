@@ -124,7 +124,6 @@ class GameManager(object):
         for player, player_handler in game.items():
             if handler != player_handler and isinstance(player, int):
                 other_players.append(player_handler)
-
         return other_players
 
 
@@ -132,7 +131,7 @@ class DraftGameManager(GameManager):
     """Extends Game Manager to add methods specific to Draft Game
     """
 
-    def new_game(self, handler, param_id):
+    def new_game(self, handler, param_id, game_name):
         """Extend new_game with tic_tac_toe instance.
         """
         game_id = super().new_game(handler)
@@ -144,6 +143,7 @@ class DraftGameManager(GameManager):
         game[YGODraft.GAME].create_draft()
         game[YGODraft.PARAM] = draft_param
         game[YGODraft.ROUND] = 0
+        game[YGODraft.NAME] = game_name
         return game_id
 
     def all_players_joined(self, game_id, player_id):
@@ -243,3 +243,19 @@ class DraftGameManager(GameManager):
         game = self.get_game(game_id)
         ygo_draft = game[YGODraft.GAME]
         return ygo_draft.get_deck(player_id)
+    
+    def get_all_games(self):
+        games = []
+        for index in self.games:
+            game = self.games[index]
+            params = game[YGODraft.PARAM]
+            game_name = game[YGODraft.NAME]
+            game_info = {
+                "num_players": params.get_player_length(),
+                "pack_size": params.get_pack_size(),
+                "game_id": index,
+                "game_name": game_name
+            }
+            games.append(game_info)
+        return games
+

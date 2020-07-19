@@ -1,8 +1,11 @@
 import pytest
 import logging
-import sys
 from pymongo import MongoClient
-sys.path.append("..")
+import os 
+path = os.path.dirname(os.path.abspath(__file__))
+parent = os.path.dirname(path) 
+import sys
+sys.path.append(parent)
 from enums.strings import HttpResponse
 from service.user_account_db_service import UserAccountDBService
 

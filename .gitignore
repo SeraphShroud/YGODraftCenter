@@ -35,4 +35,9 @@ yarn-error.log*
 /env
 /env1
 /ygodraftcenter.pyproj
+/ygodraftcenter.sln
+/src/server/templates
 /node_modules
+.vscode
+.gitignore
+

@@ -1,16 +1,15 @@
 # !/usr/bin/env python
 # -*- coding: utf-8 -*-
-import os
 import logging
 import logging.config
 
 import tornado.ioloop
 import tornado.web
+import config
 from tornado.options import options
 
-from config import settings
-from app.handlers import IndexHandler, UploadHandler
-from app.handlers import DraftHandler, DraftSocketHandler
+from app.handlers import IndexHandler, DraftHandler
+from app.handlers import DraftSocketHandler
 from app.game_managers import DraftGameManager
 from service.api_requests import APIRequest
 from service.ygo_card_db_service import YGOCardDBService
@@ -38,18 +37,17 @@ def main():
 
     urls = [
         (r"/$", IndexHandler),
-        #(r"/tic-tac-toe$", DraftHandler),
-        (r"/upload$", UploadHandler),
-        (r"/ygoserver/ws$", DraftSocketHandler,
-         dict(game_manager=draft_game_manager))
+        (r"/draft$", DraftHandler,
+         dict(game_manager=draft_game_manager, card_service=card_db_service)),
+        (r"/ygoserver/ws$$", DraftSocketHandler,
+         dict(game_manager=draft_game_manager, card_service=card_db_service))
     ]
 
     # Create Tornado application
     application = tornado.web.Application(
         urls,
         debug=options.debug,
-        autoreload=options.debug,
-        **settings)
+        autoreload=options.debug)
 
     # Start Server
     logger.info(f"Starting App on Port: {options.port} with Debug Mode: {options.debug}")

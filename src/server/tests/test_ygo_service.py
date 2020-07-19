@@ -1,11 +1,16 @@
 import pytest
 import json
 import logging
-import sys
 from pymongo import MongoClient
-sys.path.append("..")
-from service.api_requests import APIRequest
-from service.ygo_card_db_service import YGOCardDBService
+import os 
+# get current directory 
+path = os.path.dirname(os.path.abspath(__file__))
+# parent directory 
+parent = os.path.dirname(path) 
+import sys
+sys.path.append(parent)
+from server.service.api_requests import APIRequest
+from server.service.ygo_card_db_service import YGOCardDBService
 
 logger = logging.getLogger()
 
@@ -32,15 +37,15 @@ def cleanup_db():
 @pytest.fixture(scope="session", autouse=True)
 def create_control_files():
     global two_card_list, single_card, four_card_list, malformed_card
-    with open('card_jsons/2_cards_spell_trap.json', 'r') as f:
+    with open(parent + '\\test\\card_jsons\\2_cards_spell_trap.json', 'r') as f:
         result = json.load(f)
     two_card_list = [result]
-    with open('card_jsons/1_card_link.json', 'r') as f:
+    with open(parent + '\\test\\card_jsons\\1_card_link.json', 'r') as f:
         single_card = json.load(f)
-    with open('card_jsons/4_cards_correct.json', 'r') as f:
+    with open(parent + '\\test\\card_jsons\\4_cards_correct.json', 'r') as f:
         result = json.load(f)
     four_card_list = [result]
-    with open('card_jsons/1_card_no_id.json', 'r') as f:
+    with open(parent + '\\test\\card_jsons\\1_card_no_id.json', 'r') as f:
         malformed_card = json.load(f)
 
 
@@ -56,7 +61,7 @@ def cleanup_and_setup_db():
 
 @pytest.fixture()
 def insert_basic_data():
-    with open('card_jsons/4_cards_correct.json', 'r') as f:
+    with open(parent + '\\test\\card_jsons\\4_cards_correct.json', 'r') as f:
         card_json = json.load(f)
         # logger.debug(card_json)
     cursor.insert_many(card_json)

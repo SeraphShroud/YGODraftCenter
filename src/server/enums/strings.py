@@ -25,3 +25,20 @@ class MongoDB:
     DB_URL = f"mongodb://{DB_HOST}:{DB_PORT}"
     DB_NAME = "yugioh_db"
     CARD_COLLECTION_NAME = "card_info"
+
+
+class Draft:
+    KEY = "draft"
+    DECK = "deck"
+    PACK = "pack"
+    EXTRA = "#extra"
+
+
+class YGODraft:
+    ROUND = "draft_round"
+    GAME = "ygo_draft"
+    PARAM = "draft_param"
+    MAIN = "main_draft"
+    EXTRA = "extra_draft"
+    NAME= "draft_name"
+

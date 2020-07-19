@@ -6,7 +6,7 @@
         Each user is represented by the User class which this class manages.
 """
 import logging
-from enums.strings import HttpResponse
+from server.enums.strings import HttpResponse
 import hashlib
 from service.mongodb_service import MongoDBService
 from user import User
